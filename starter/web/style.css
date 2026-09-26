@@ -1,5 +1,5 @@
 :root {
-  font-family: "DM Sans Variable", sans-serif;
+  font-family: "Space Grotesk Variable", sans-serif;
   color: #253138;
   font-synthesis: none;
   font-size: 14px;
@@ -55,7 +55,7 @@ h1,
 h2,
 h3,
 .brand {
-  font-family: "Manrope Variable", sans-serif;
+  font-family: "Space Grotesk Variable", sans-serif;
 }
 h1 {
   letter-spacing: -1.25px;
@@ -150,7 +150,7 @@ a {
   color: #fff;
   font-size: 28px;
   font-weight: 800;
-  font-family: "Manrope Variable", sans-serif;
+  font-family: "Space Grotesk Variable", sans-serif;
   line-height: 1;
 }
 .version {
@@ -434,13 +434,13 @@ nav button.active {
   display: flex;
   align-items: baseline;
   gap: 14px;
-  font-family: "Manrope Variable", sans-serif;
+  font-family: "Space Grotesk Variable", sans-serif;
   font-size: 29px;
   color: #294238;
   margin-top: 9px;
 }
 .stats small {
-  font-family: "DM Sans Variable", sans-serif;
+  font-family: "Space Grotesk Variable", sans-serif;
   font-size: 10px;
   font-weight: 400;
   color: #93a09a;
@@ -1060,6 +1060,8 @@ dialog h2 {
   color-scheme: dark;
   color: #d6d8dc;
   background: #030303;
+  --font-interface: "Space Grotesk Variable", sans-serif;
+  --font-telemetry: "JetBrains Mono Variable", monospace;
   --black-0: #020202;
   --black-1: #070707;
   --black-2: #0c0c0d;
@@ -1080,6 +1082,7 @@ dialog h2 {
 }
 
 body {
+  font-family: var(--font-interface);
   background:
     radial-gradient(
       circle at 78% 12%,
@@ -1134,6 +1137,33 @@ small,
 .workspace-label,
 .eyebrow {
   color: var(--silver-3);
+}
+
+.workspace-label,
+.eyebrow,
+.version,
+.status-pill,
+.badge,
+th,
+.mock-label,
+.permission-list small,
+.record-note small,
+.table-footer {
+  font-family: var(--font-telemetry);
+  font-variant-numeric: tabular-nums;
+}
+
+.workspace-label,
+.eyebrow,
+th {
+  letter-spacing: 0.12em;
+}
+
+.stats strong,
+td,
+input,
+select {
+  font-variant-numeric: tabular-nums;
 }
 
 button,

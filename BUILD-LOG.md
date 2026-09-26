@@ -47,3 +47,8 @@ This is the contemporaneous implementation record. Entries describe observed wor
 - Added slow, CSS-only background motion that supports the remote-operations setting: a rotating telemetry field, diagonal signal sweep, drifting grid, and login orbit. Every layer ignores pointer input and remains behind the application surfaces.
 - Added a complete reduced-motion override that stops the new ambient effects along with the existing status and logo animations when the operating system requests less motion.
 - Production build and formatting checks pass. All 31 browser tests pass in 22.5 seconds; the test-generated dashboard screenshot was refreshed with the animated theme in its resting state.
+
+## Phase 6 — Operations-focused typography (2026-09-27)
+- Replaced DM Sans and Manrope with locally bundled Space Grotesk and JetBrains Mono. Space Grotesk now carries the readable interface hierarchy; JetBrains Mono is limited to telemetry-style metadata such as statuses, table headings, version labels, and permission details.
+- The first browser run passed 30 checks and exposed a transient notice-timing failure in the device workflow. That workflow passed in isolation, followed by a clean full run of all 31 browser tests in 19.4 seconds.
+- Production build and formatting checks pass. The refreshed font bundle adds no network dependency at runtime, and the dashboard screenshot was regenerated from the final browser run.

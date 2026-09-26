@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "Q1 \u2014 multi-org permission console. One process: node:http API + Vite/React SPA.",
+  "description": "Q1 — multi-org permission console. One process: node:http API + Vite/React SPA.",
   "scripts": {
     "dev": "node --watch-path=./server --watch server/index.js",
     "build": "vite build",
@@ -19,8 +19,8 @@
     "format:check": "prettier --check \"web/**/*.{js,jsx,css}\" \"server/**/*.js\""
   },
   "dependencies": {
-    "@fontsource-variable/dm-sans": "^5.3.0",
-    "@fontsource-variable/manrope": "^5.3.0",
+    "@fontsource-variable/jetbrains-mono": "^5.3.0",
+    "@fontsource-variable/space-grotesk": "^5.3.0",
     "better-sqlite3": "^11.10.0"
   },
   "devDependencies": {

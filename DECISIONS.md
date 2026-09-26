@@ -76,3 +76,10 @@
 - **Why:** Radar rotation, signal sweeps, and grid drift reinforce the live operations context without changing application state or competing with tables and controls.
 - **Rejected:** Canvas particles and looping video. Both add runtime and asset weight, and their continuous high-detail movement would distract from operational data.
 - **Reconsider if:** A future brand motion specification calls for authored assets and includes performance and accessibility targets.
+
+## Separate interface type from telemetry type
+- **Choice:** Use Space Grotesk for general interface text and JetBrains Mono only for compact operational metadata, with both fonts bundled locally through Fontsource.
+- **Why:** Space Grotesk gives the monochrome console a more technical shape while remaining readable in forms and tables. Monospaced metadata makes statuses, identifiers, timestamps, and numeric values easier to scan without making long-form UI copy feel dense.
+- **Rejected:** A monospaced font across the whole application, which reduces readability; keeping DM Sans and Manrope, whose softer editorial character did not reinforce the remote-operations purpose as clearly.
+- **Reconsider if:** User testing shows the geometric letterforms or compact telemetry labels reduce readability at small sizes.
+- **Sources:** https://fontsource.org/fonts/space-grotesk and https://fontsource.org/fonts/jetbrains-mono (font files and package metadata).
