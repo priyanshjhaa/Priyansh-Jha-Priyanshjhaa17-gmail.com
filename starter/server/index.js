@@ -16,6 +16,7 @@ import { openDatabase } from './db.js';
 import { send, sendError, readJson, notFound } from './http.js';
 import { authenticate } from './context.js';
 import { registerRoutes } from './routes/index.js';
+import { expireSessions } from './lifecycle.js';
 
 const DEV = process.env.NODE_ENV !== 'production';
 const PORT = Number(process.env.PORT ?? 8080);
@@ -30,6 +31,7 @@ registerRoutes(router, { db, secret: SECRET });
 const PUBLIC_ROUTES = new Set([
   'POST /v1/auth/login',
   'POST /v1/auth/refresh',
+  'POST /v1/auth/logout',
   'GET /v1/invites/:token',
   'POST /v1/invites/:token/accept',
 ]);
@@ -109,7 +111,12 @@ if (DEV) {
   console.log('vite middleware attached (HMR enabled)');
 }
 
+const expiryTimer = setInterval(() => { try { expireSessions(db); } catch (error) { console.error('Session cleanup failed:', error.message); } }, 15000);
+expiryTimer.unref();
+
 const server = http.createServer((req, res) => {
+  res.setHeader('Referrer-Policy', 'no-referrer');
+  res.setHeader('X-Content-Type-Options', 'nosniff');
   const url = new URL(req.url, `http://${req.headers.host}`);
 
   if (url.pathname === '/v1' || url.pathname.startsWith('/v1/')) {
@@ -126,6 +133,7 @@ server.listen(PORT, () => {
 
 for (const signal of ['SIGINT', 'SIGTERM']) {
   process.on(signal, () => {
+    clearInterval(expiryTimer);
     server.close(() => {
       db.close();
       process.exit(0);

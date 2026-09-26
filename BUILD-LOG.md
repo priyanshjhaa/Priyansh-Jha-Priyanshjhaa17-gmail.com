@@ -15,3 +15,9 @@ This is the contemporaneous implementation record. Entries describe observed wor
 - Original API baseline returns missing-route responses and aborts. Original UI baseline times out waiting for its `/auth/me` readiness URL because no routes exist yet. Neither baseline is reported as passing.
 - Loader now works in the space-containing checkout. The seed contains an additional role and permission, confirming that fixed catalogue assumptions would be wrong.
 - GitHub CLI is unauthenticated. User confirmed solo identity and was asked to authenticate; publication remains pending.
+
+## Phase 2 — Backend implementation (2026-09-27)
+- Implemented token verification and caller context, then one database-driven permission engine. First run: JWT 43/43, permissions 35/35.
+- Implemented all published route groups plus catalogue and logout. First API run after wiring: 66 passed, 0 failed. Personalized fixture: 18 passed, 0 failed.
+- Observed two schema details requiring explicit transactional handling: invitation uniqueness does not account for time expiry; refresh replay revocation would roll back if an exception escaped its transaction. Expired invitations are retired on replacement, and replay rejection is returned from the transaction then thrown after commit.
+- Full browser suite is now testing the real HTTP adapter. Mock preview success was not counted toward these checks.
