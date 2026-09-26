@@ -15,3 +15,15 @@
 - The root repository README describes `q1-starter` as reference implementation; work is restricted to `starter`.
 - The UI inventory says seven cards but lists six; implement the six enumerated cards.
 - The email says roughly one-third documentation; the candidate rubric specifies 30% documentation, 50% code, 20% walkthrough.
+
+## Request-local authority, no cross-request cache
+- **Choice:** Batch catalogue/grant queries within a request, then resolve device rows from that snapshot.
+- **Why:** Time-window expiry must take effect on the next request even without a mutation/version bump.
+- **Rejected:** A simple TTL permission cache can authorize a just-expired grant.
+- **Reconsider if:** Measured query costs justify a cache with exact expiry/version invalidation.
+
+## Preserve platform paths correctly
+- **Choice:** Use `fileURLToPath` for loader/static paths.
+- **Why:** Baseline db:reset failed with ENOENT on `Rhinostream%20applocation`.
+- **Rejected:** Renaming the user's directory would hide a portability bug and fail other checkouts containing spaces.
+- **Reconsider if:** File APIs receive URL objects directly everywhere.

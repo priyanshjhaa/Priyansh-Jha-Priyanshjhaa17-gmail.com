@@ -1,3 +1,4 @@
+import { fileURLToPath } from 'node:url';
 // Loads db/schema.sql, db/reference.sql, then seed/orgs.json.
 // Idempotent: drops and recreates app.db.  Run: npm run db:reset
 
@@ -7,7 +8,7 @@ import { hashPassword } from '../server/auth.js';
 import { readNonce, buildOverlay, applyOverlay, describeOverlay } from './personalise.js';
 
 const DB_FILE = process.env.DATABASE_FILE ?? 'app.db';
-const here = (p) => new URL(p, import.meta.url).pathname;
+const here = (p) => fileURLToPath(new URL(p, import.meta.url));
 
 for (const suffix of ['', '-wal', '-shm']) {
   if (existsSync(DB_FILE + suffix)) rmSync(DB_FILE + suffix);

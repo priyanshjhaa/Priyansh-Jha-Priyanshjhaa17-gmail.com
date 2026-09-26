@@ -1,3 +1,4 @@
+import { fileURLToPath } from 'node:url';
 // The whole application: one process, one port.
 //
 //   /v1/*  -> the API (routes registered in server/routes/)
@@ -19,7 +20,7 @@ import { registerRoutes } from './routes/index.js';
 const DEV = process.env.NODE_ENV !== 'production';
 const PORT = Number(process.env.PORT ?? 8080);
 const SECRET = process.env.JWT_SECRET ?? 'dev-secret-change-me';
-const DIST = new URL('../dist/', import.meta.url).pathname;
+const DIST = fileURLToPath(new URL('../dist/', import.meta.url));
 
 const db = openDatabase();
 const router = createRouter();
