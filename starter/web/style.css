@@ -1050,6 +1050,577 @@ dialog h2 {
     font-size: 9px;
   }
 }
+
+/* --------------------------------------------------------------------------
+   Obsidian console theme
+   A monochrome control-room surface: deep black glass, polished silver type,
+   and restrained scanning/highlight effects that fit an access-control product.
+   -------------------------------------------------------------------------- */
+:root {
+  color-scheme: dark;
+  color: #d6d8dc;
+  background: #030303;
+  --black-0: #020202;
+  --black-1: #070707;
+  --black-2: #0c0c0d;
+  --black-3: #121214;
+  --silver-0: #f6f7f8;
+  --silver-1: #d4d6da;
+  --silver-2: #a3a6ac;
+  --silver-3: #6c6f75;
+  --line: rgba(220, 223, 228, 0.14);
+  --line-strong: rgba(238, 240, 243, 0.26);
+  --metal: linear-gradient(
+    110deg,
+    #777a80 0%,
+    #f7f8fa 42%,
+    #a7aab0 70%,
+    #e4e6e9 100%
+  );
+}
+
+body {
+  background:
+    radial-gradient(
+      circle at 78% 12%,
+      rgba(255, 255, 255, 0.075),
+      transparent 28rem
+    ),
+    radial-gradient(
+      circle at 38% 82%,
+      rgba(255, 255, 255, 0.035),
+      transparent 34rem
+    ),
+    #030303;
+  color: var(--silver-1);
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.2;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.014) 1px, transparent 1px);
+  background-size: 42px 42px;
+  mask-image: linear-gradient(to bottom, black, transparent 85%);
+}
+
+h1,
+h2,
+h3,
+.brand,
+.stats strong,
+.page-heading h1 {
+  color: var(--silver-0);
+}
+
+.page-heading h1,
+.login-story h1,
+.login-panel h2 {
+  background: var(--metal);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  text-shadow: 0 0 34px rgba(255, 255, 255, 0.09);
+}
+
+small,
+.muted,
+.page-heading p,
+.workspace-label,
+.eyebrow {
+  color: var(--silver-3);
+}
+
+button,
+input,
+select,
+textarea {
+  color: var(--silver-1);
+  border-color: var(--line);
+  background: linear-gradient(180deg, #151517, #0b0b0c);
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.045);
+}
+
+button:hover {
+  color: #fff;
+  border-color: var(--line-strong);
+  background: linear-gradient(180deg, #202023, #101012);
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid #d8dade;
+  outline-offset: 2px;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: #777b82;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #5e6167;
+}
+
+input[type="checkbox"] {
+  accent-color: #c7c9cd;
+}
+
+.app {
+  isolation: isolate;
+  --accent: #d7d9dd;
+  --accent-dark: #a7aab0;
+  --tint: #111113;
+  background-color: #050505;
+  background-image:
+    radial-gradient(
+      circle at 82% 2%,
+      rgba(255, 255, 255, 0.065),
+      transparent 25rem
+    ),
+    linear-gradient(
+      125deg,
+      transparent 0 46%,
+      rgba(255, 255, 255, 0.018) 48%,
+      transparent 51%
+    );
+  color: var(--silver-1);
+}
+
+.app::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0 4px,
+    rgba(255, 255, 255, 0.008) 5px
+  );
+}
+
+.theme-forest,
+.theme-violet {
+  background-color: inherit;
+}
+
+.sidebar {
+  background: rgba(5, 5, 6, 0.92);
+  border-right-color: var(--line);
+  box-shadow: 22px 0 60px rgba(0, 0, 0, 0.32);
+  backdrop-filter: blur(22px);
+}
+
+.brand {
+  color: #eef0f2;
+}
+
+.brand-symbol {
+  color: #080808;
+  background: var(--metal);
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.9),
+    0 0 25px rgba(255, 255, 255, 0.12);
+}
+
+.version {
+  color: #a8abb0;
+  border-color: var(--line-strong);
+  background: #0d0d0f;
+}
+
+.org-option,
+.create-org,
+nav button {
+  color: #81848a;
+}
+
+.org-option:hover,
+.create-org:hover,
+nav button:hover {
+  color: #dfe1e4;
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.org-option small {
+  color: #5f6268;
+}
+
+.org-option.selected {
+  color: #f4f5f6;
+  background: linear-gradient(
+    110deg,
+    rgba(255, 255, 255, 0.105),
+    rgba(255, 255, 255, 0.025)
+  );
+  border-color: var(--line-strong);
+  box-shadow:
+    inset 0 1px rgba(255, 255, 255, 0.08),
+    0 12px 30px rgba(0, 0, 0, 0.36);
+}
+
+.org-avatar,
+.avatar,
+.device-icon {
+  color: #d6d8dc;
+  background: linear-gradient(145deg, #1c1c1f, #0b0b0c);
+  border: 1px solid var(--line);
+}
+
+.org-dot,
+.nav-indicator,
+.status-pill i,
+.dot {
+  background: #e5e7ea;
+  box-shadow: 0 0 9px rgba(255, 255, 255, 0.58);
+}
+
+nav button.active {
+  color: #f0f1f3;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.11),
+    rgba(255, 255, 255, 0.025)
+  );
+  box-shadow: inset 1px 0 #e1e3e6;
+}
+
+.record-note {
+  color: #b8bbc0;
+  background: linear-gradient(145deg, #121214, #09090a);
+  border: 1px solid var(--line);
+}
+
+.record-note b {
+  color: #d7d9dc;
+}
+
+.record-note small {
+  color: #686b71;
+}
+
+.profile,
+.topbar {
+  border-color: var(--line);
+}
+
+.profile b {
+  color: #e6e8ea;
+}
+
+.profile button,
+.text-button {
+  color: #888b91;
+}
+
+.topbar {
+  color: #7d8086;
+  background: rgba(5, 5, 6, 0.62);
+  backdrop-filter: blur(18px);
+}
+
+.slash {
+  color: #3f4146;
+}
+
+.status-pill {
+  color: #a7aab0;
+}
+
+.primary {
+  color: #080808;
+  background: var(--metal);
+  border-color: #e7e8ea;
+  box-shadow:
+    inset 0 1px rgba(255, 255, 255, 0.95),
+    0 8px 24px rgba(255, 255, 255, 0.09);
+}
+
+.primary:hover {
+  color: #000;
+  background: linear-gradient(110deg, #a9acb2, #ffffff 45%, #c8cad0 100%);
+  border-color: #fff;
+}
+
+.stats > div,
+.card {
+  position: relative;
+  color: var(--silver-2);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.045), transparent 46%),
+    linear-gradient(180deg, #101012, #09090a);
+  border-color: var(--line);
+  box-shadow:
+    inset 0 1px rgba(255, 255, 255, 0.045),
+    0 18px 55px rgba(0, 0, 0, 0.34);
+}
+
+.stats > div::before,
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto auto 0;
+  width: 42%;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.72), transparent);
+  opacity: 0.46;
+}
+
+.stats > div > span,
+.stats small {
+  color: #777a80;
+}
+
+.stats strong {
+  color: #eff0f2;
+  text-shadow: 0 0 24px rgba(255, 255, 255, 0.08);
+}
+
+.search {
+  background: #09090a;
+}
+
+th {
+  color: #7f8288;
+  background: #0a0a0b;
+  border-color: var(--line);
+}
+
+td {
+  color: #a9acb1;
+  border-bottom-color: rgba(255, 255, 255, 0.07);
+}
+
+tbody tr {
+  transition: background 0.18s ease;
+}
+
+tbody tr:hover {
+  background: rgba(255, 255, 255, 0.025);
+}
+
+td b {
+  color: #e1e3e6;
+}
+
+td small {
+  color: #62656a;
+}
+
+.row-actions button {
+  color: #afb2b7;
+  border-color: var(--line);
+  background: linear-gradient(180deg, #151517, #0a0a0b);
+}
+
+.row-actions button:hover {
+  color: white;
+  border-color: #777a80;
+}
+
+.online {
+  color: #e1e3e6;
+  background: rgba(220, 223, 228, 0.11);
+  border: 1px solid rgba(220, 223, 228, 0.16);
+}
+
+.neutral {
+  color: #8a8d93;
+  background: #171719;
+}
+
+.denied,
+.danger,
+.danger-text {
+  color: #a6a8ad;
+  background: rgba(255, 255, 255, 0.035);
+  border-color: rgba(255, 255, 255, 0.13);
+}
+
+.table-footer {
+  color: #606369;
+  background: #080809;
+}
+
+.page-footer,
+.empty,
+.skeleton {
+  color: #62656a;
+}
+
+.empty-icon,
+.empty h3 {
+  color: #bcbfc4;
+}
+
+.notice {
+  background: #101012;
+  border-color: var(--line-strong);
+}
+
+.error {
+  color: #dedfe2;
+  box-shadow: inset 3px 0 #7f8288;
+}
+
+.success {
+  color: #f0f1f2;
+  box-shadow: inset 3px 0 #d6d8dc;
+}
+
+.settings hr,
+.permission-list > div {
+  border-color: var(--line);
+}
+
+.field > span,
+legend {
+  color: #b5b8bd;
+}
+
+fieldset {
+  border-color: var(--line);
+}
+
+dialog {
+  color: #d0d2d6;
+  background:
+    radial-gradient(
+      circle at 90% 0,
+      rgba(255, 255, 255, 0.09),
+      transparent 17rem
+    ),
+    #0b0b0d;
+  border-color: var(--line-strong);
+  box-shadow:
+    inset 0 1px rgba(255, 255, 255, 0.06),
+    0 35px 110px rgba(0, 0, 0, 0.82);
+}
+
+dialog::backdrop {
+  background: rgba(0, 0, 0, 0.78);
+  backdrop-filter: blur(8px);
+}
+
+.login,
+.invite-page,
+.boot {
+  background:
+    radial-gradient(
+      circle at 18% 12%,
+      rgba(255, 255, 255, 0.085),
+      transparent 28rem
+    ),
+    radial-gradient(
+      circle at 84% 75%,
+      rgba(255, 255, 255, 0.035),
+      transparent 32rem
+    ),
+    #030303;
+}
+
+.login-story {
+  position: relative;
+  overflow: hidden;
+  color: #e8eaec;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.065), transparent 36%),
+    #050506;
+  border-right: 1px solid var(--line);
+}
+
+.login-story::after {
+  content: "";
+  position: absolute;
+  width: 34rem;
+  height: 34rem;
+  right: -18rem;
+  bottom: -19rem;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 5rem rgba(255, 255, 255, 0.012),
+    0 0 0 10rem rgba(255, 255, 255, 0.009);
+}
+
+.login-story .brand-symbol {
+  color: #090909;
+  background: var(--metal);
+}
+
+.login-story .eyebrow,
+.login-story small,
+.story-grid {
+  color: #70737a;
+}
+
+.login-story p,
+.story-grid b {
+  color: #a9acb2;
+}
+
+.login-panel {
+  background: rgba(3, 3, 4, 0.72);
+}
+
+.demo-note {
+  color: #9fa2a8;
+  background: linear-gradient(145deg, #111113, #09090a);
+  border-color: var(--line);
+}
+
+.mock-label {
+  color: #a2a5aa;
+}
+
+.invite-card {
+  background: linear-gradient(145deg, #121214, #080809);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .status-pill i,
+  .org-dot {
+    animation: silver-pulse 2.6s ease-in-out infinite;
+  }
+
+  .brand-symbol {
+    animation: metal-glint 8s ease-in-out infinite;
+    background-size: 180% 100%;
+  }
+}
+
+@keyframes silver-pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.25);
+  }
+  50% {
+    opacity: 1;
+    box-shadow: 0 0 11px rgba(255, 255, 255, 0.68);
+  }
+}
+
+@keyframes metal-glint {
+  0%,
+  82%,
+  100% {
+    background-position: 0% 50%;
+  }
+  91% {
+    background-position: 100% 50%;
+  }
+}
 /* Preserve switcher hit targets when six navigation items exceed a short viewport. */
 .sidebar {
   overflow-y: auto;

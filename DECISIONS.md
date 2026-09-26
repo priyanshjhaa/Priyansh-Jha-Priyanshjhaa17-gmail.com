@@ -64,3 +64,9 @@
 - **Rejected:** Runtime Google Fonts CSS and compressed source.
 - **Reconsider if:** Asset measurements warrant system fonts alone.
 - **Sources:** https://fontsource.org/fonts/dm-sans and https://fontsource.org/fonts/manrope (font files); https://prettier.io/ (development formatting).
+
+## Monochrome workspace identity
+- **Choice:** Use only black, graphite, and silver throughout, with per-organization identity expressed as small changes in black surface depth and silver intensity.
+- **Why:** The requested direction is an all-black interface with shiny silver type and effects that reinforce a secure operations console. The supplied tests also require switching organizations to create a measurable visual change.
+- **Rejected:** Keeping colored organization accents, which conflicts with the monochrome direction; making every organization pixel-identical, which removes a required identity signal.
+- **Reconsider if:** Product branding later supplies organization-specific monochrome marks or textures that can replace the computed surface variation.

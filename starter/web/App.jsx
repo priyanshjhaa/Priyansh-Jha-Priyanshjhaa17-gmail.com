@@ -470,15 +470,15 @@ function Workspace({ me, setMe }) {
     (n, c) => (n * 31 + c.charCodeAt(0)) % 360,
     0,
   );
-  const colors =
-    org.theme === "cobalt"
-      ? {}
-      : {
-          backgroundColor: `hsl(${hue} 25% 96%)`,
-          "--accent": `hsl(${hue} 30% 35%)`,
-          "--accent-dark": `hsl(${hue} 30% 26%)`,
-          "--tint": `hsl(${hue} 25% 92%)`,
-        };
+  // Each workspace keeps a distinct identity through a subtly different black
+  // surface and silver intensity. The palette stays monochrome throughout.
+  const silverLevel = 68 + (hue % 16);
+  const colors = {
+    backgroundColor: `hsl(0 0% ${3 + (hue % 3)}%)`,
+    "--accent": `hsl(0 0% ${silverLevel}%)`,
+    "--accent-dark": `hsl(0 0% ${Math.max(54, silverLevel - 12)}%)`,
+    "--tint": `hsl(0 0% ${8 + (hue % 3)}%)`,
+  };
   return (
     <div
       className={`app theme-${theme}`}
