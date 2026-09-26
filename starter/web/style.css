@@ -1587,7 +1587,146 @@ dialog::backdrop {
   background: linear-gradient(145deg, #121214, #080809);
 }
 
+/* Ambient telemetry motion stays behind every interactive surface. */
+.main {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.main > * {
+  position: relative;
+  z-index: 1;
+}
+
+.main::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+  width: 54rem;
+  aspect-ratio: 1;
+  top: -31rem;
+  right: -18rem;
+  border-radius: 50%;
+  opacity: 0.28;
+  background:
+    repeating-radial-gradient(
+      circle,
+      transparent 0 4.8rem,
+      rgba(255, 255, 255, 0.085) 4.85rem 4.9rem
+    ),
+    conic-gradient(
+      from 0deg,
+      transparent 0 78%,
+      rgba(255, 255, 255, 0.11) 88%,
+      transparent 94%
+    );
+  mask-image: radial-gradient(circle, black 0 55%, transparent 73%);
+}
+
+.main::after {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+  top: 0;
+  bottom: 0;
+  left: -28%;
+  width: 22%;
+  opacity: 0;
+  transform: skewX(-18deg);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.018),
+    rgba(255, 255, 255, 0.048),
+    transparent
+  );
+  filter: blur(1px);
+}
+
+.login {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.login::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.22;
+  background:
+    linear-gradient(
+      115deg,
+      transparent 40%,
+      rgba(255, 255, 255, 0.045) 50%,
+      transparent 60%
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0 89px,
+      rgba(255, 255, 255, 0.024) 90px
+    );
+  background-size:
+    220% 100%,
+    auto;
+}
+
+.login-panel {
+  position: relative;
+  overflow: hidden;
+}
+
+.login-panel::before {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  width: 30rem;
+  aspect-ratio: 1;
+  right: -19rem;
+  top: 12%;
+  border: 1px solid rgba(255, 255, 255, 0.065);
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 4rem rgba(255, 255, 255, 0.01),
+    0 0 0 8rem rgba(255, 255, 255, 0.007);
+}
+
+.login-panel > * {
+  position: relative;
+  z-index: 1;
+}
+
 @media (prefers-reduced-motion: no-preference) {
+  body::before {
+    animation: grid-drift 28s linear infinite;
+  }
+
+  .app::after {
+    animation: scan-drift 14s linear infinite;
+  }
+
+  .main::before {
+    animation: telemetry-rotate 34s linear infinite;
+  }
+
+  .main::after {
+    animation: signal-sweep 13s ease-in-out infinite;
+  }
+
+  .login::before {
+    animation: login-signal 18s linear infinite;
+  }
+
+  .login-story::after,
+  .login-panel::before {
+    animation: orbit-breathe 12s ease-in-out infinite;
+  }
+
   .status-pill i,
   .org-dot {
     animation: silver-pulse 2.6s ease-in-out infinite;
@@ -1596,6 +1735,78 @@ dialog::backdrop {
   .brand-symbol {
     animation: metal-glint 8s ease-in-out infinite;
     background-size: 180% 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+@keyframes grid-drift {
+  to {
+    background-position:
+      42px 42px,
+      42px 42px;
+  }
+}
+
+@keyframes scan-drift {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 0 120px;
+  }
+}
+
+@keyframes telemetry-rotate {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes signal-sweep {
+  0%,
+  68% {
+    left: -28%;
+    opacity: 0;
+  }
+  74% {
+    opacity: 0.6;
+  }
+  92% {
+    left: 118%;
+    opacity: 0.18;
+  }
+  100% {
+    left: 118%;
+    opacity: 0;
+  }
+}
+
+@keyframes login-signal {
+  to {
+    background-position:
+      -220% 0,
+      90px 0;
+  }
+}
+
+@keyframes orbit-breathe {
+  0%,
+  100% {
+    transform: scale(0.96) rotate(0deg);
+    opacity: 0.55;
+  }
+  50% {
+    transform: scale(1.05) rotate(8deg);
+    opacity: 0.95;
   }
 }
 

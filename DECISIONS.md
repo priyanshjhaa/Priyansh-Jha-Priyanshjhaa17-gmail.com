@@ -70,3 +70,9 @@
 - **Why:** The requested direction is an all-black interface with shiny silver type and effects that reinforce a secure operations console. The supplied tests also require switching organizations to create a measurable visual change.
 - **Rejected:** Keeping colored organization accents, which conflicts with the monochrome direction; making every organization pixel-identical, which removes a required identity signal.
 - **Reconsider if:** Product branding later supplies organization-specific monochrome marks or textures that can replace the computed surface variation.
+
+## Ambient motion stays decorative and accessibility-aware
+- **Choice:** Build the background motion with low-contrast CSS pseudo-elements, long animation cycles, no pointer handling, and a `prefers-reduced-motion` override.
+- **Why:** Radar rotation, signal sweeps, and grid drift reinforce the live operations context without changing application state or competing with tables and controls.
+- **Rejected:** Canvas particles and looping video. Both add runtime and asset weight, and their continuous high-detail movement would distract from operational data.
+- **Reconsider if:** A future brand motion specification calls for authored assets and includes performance and accessibility targets.

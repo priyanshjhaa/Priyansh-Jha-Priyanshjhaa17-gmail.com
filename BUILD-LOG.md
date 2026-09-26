@@ -42,3 +42,8 @@ This is the contemporaneous implementation record. Entries describe observed wor
 - Reworked the complete interface into an all-black control-console palette after the requested visual-direction change. The new system uses near-black layered surfaces, metallic silver typography, local glow and scanning textures, and reduced-motion-aware status animation.
 - Preserved a measurable organization identity using slightly different black surface levels and silver intensity rather than colored themes. This keeps the UI monochrome while retaining the required organization-switch behavior.
 - Rebuilt successfully, formatting checks passed, and all 31 browser tests passed in 11.0 seconds. The test-generated dashboard screenshot was refreshed with the new appearance.
+
+## Phase 5 — Ambient console motion (2026-09-27)
+- Added slow, CSS-only background motion that supports the remote-operations setting: a rotating telemetry field, diagonal signal sweep, drifting grid, and login orbit. Every layer ignores pointer input and remains behind the application surfaces.
+- Added a complete reduced-motion override that stops the new ambient effects along with the existing status and logo animations when the operating system requests less motion.
+- Production build and formatting checks pass. All 31 browser tests pass in 22.5 seconds; the test-generated dashboard screenshot was refreshed with the animated theme in its resting state.
