@@ -8,7 +8,7 @@
 - [x] Frontend: login, organization shell, six areas, invitation acceptance
 - [x] Frontend: server-driven presence, required test attributes, errors and accessibility
 - [x] Four original suites, personalization, added edge cases, production build
-- [ ] Performance measurements and fresh-checkout startup verification
+- [x] Performance measurements and fresh-checkout startup verification
 - [x] Root log and decisions committed throughout
 - [ ] Public correctly named personal repository and final push
 - [ ] Actual suite summaries, registered contact/team details, form submission

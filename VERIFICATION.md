@@ -37,6 +37,6 @@ Hardening covers malformed credentials, future permission versions, cross-org re
 ## Submission status
 
 - Local implementation, original test suites, supplementary checks, and documentation: complete.
-- Fresh-checkout execution: verification follows the final implementation commit.
+- Fresh-checkout execution: cloned implementation commit `4b508e5` into a new temporary directory, ran the documented command verbatim, and verified homepage 200, login 200, and an authenticated device list with five records. Dependency installation reported zero vulnerabilities.
 - Public personal fork and final push: pending GitHub authentication.
 - Form: not submitted. User must confirm registered phone details and authorize submission; the live walkthrough declaration requires their own review and understanding.

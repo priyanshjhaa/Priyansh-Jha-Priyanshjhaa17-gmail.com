@@ -36,3 +36,4 @@ This is the contemporaneous implementation record. Entries describe observed wor
 - Browser measurement: login screen 50 ms; sign-in to first device 123 ms. Saved the actual test screenshot to artifacts/dashboard.png.
 - Formatting and whitespace checks pass. Database schema/reference files are unchanged from upstream.
 - GitHub authentication check still reports no signed-in hosts; publishing is pending. No submission form has been sent.
+- Fresh clone of implementation commit 4b508e5: exact documented npm install/reset/dev command succeeds. Homepage, login, and authenticated device listing return 200; list has the expected five records. No previously installed dependencies or workspace database were reused.
