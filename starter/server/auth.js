@@ -6,23 +6,29 @@
 //
 // The payload is base64, NOT encrypted. Never put a secret in it.
 
-import { createHmac, timingSafeEqual, randomBytes, scryptSync, randomUUID } from 'node:crypto';
-import { unauthenticated, tokenStale } from './http.js';
-const ALG = 'HS256';
-const ISS = 'remoteops';
-const AUD = 'remoteops-api';
+import {
+  createHmac,
+  timingSafeEqual,
+  randomBytes,
+  scryptSync,
+  randomUUID,
+} from "node:crypto";
+import { unauthenticated, tokenStale } from "./http.js";
+const ALG = "HS256";
+const ISS = "remoteops";
+const AUD = "remoteops-api";
 
 export const ACCESS_TTL_SECONDS = 15 * 60;
 export const REFRESH_TTL_SECONDS = 30 * 24 * 60 * 60;
 
-const b64 = (buf) => Buffer.from(buf).toString('base64url');
-const unb64 = (str) => Buffer.from(str, 'base64url');
+const b64 = (buf) => Buffer.from(buf).toString("base64url");
+const unb64 = (str) => Buffer.from(str, "base64url");
 
 export function signToken(claims, secret) {
-  const header = { alg: ALG, typ: 'JWT' };
+  const header = { alg: ALG, typ: "JWT" };
   const h = b64(JSON.stringify(header));
   const p = b64(JSON.stringify(claims));
-  const sig = createHmac('sha256', secret).update(`${h}.${p}`).digest();
+  const sig = createHmac("sha256", secret).update(`${h}.${p}`).digest();
   return `${h}.${p}.${b64(sig)}`;
 }
 
@@ -43,7 +49,7 @@ export function issueAccessToken({ userId, orgId, role, permVersion }, secret) {
       iat: now,
       exp: now + ACCESS_TTL_SECONDS,
     },
-    secret
+    secret,
   );
 }
 
@@ -72,32 +78,64 @@ export function issueAccessToken({ userId, orgId, role, permVersion }, secret) {
 // ---------------------------------------------------------------------------
 export function verifyAccessToken(token, secret) {
   try {
-    if (typeof token !== 'string' || token.length > 16384) throw new Error();
-    const segments = token.split('.');
-    if (segments.length !== 3 || segments.some(s => !/^[A-Za-z0-9_-]+$/.test(s))) throw new Error();
+    if (typeof token !== "string" || token.length > 16384) throw new Error();
+    const segments = token.split(".");
+    if (
+      segments.length !== 3 ||
+      segments.some((s) => !/^[A-Za-z0-9_-]+$/.test(s))
+    )
+      throw new Error();
     const [h, p, signature] = segments;
-    const decode = s => { const buffer = Buffer.from(s, 'base64url'); if (buffer.toString('base64url') !== s) throw new Error(); return buffer; };
-    const header = JSON.parse(decode(h).toString('utf8'));
-    const claims = JSON.parse(decode(p).toString('utf8'));
-    if (!header || Array.isArray(header) || header.alg !== ALG || header.typ !== 'JWT') throw new Error();
-    const expected = createHmac('sha256', secret).update(`${h}.${p}`).digest();
+    const decode = (s) => {
+      const buffer = Buffer.from(s, "base64url");
+      if (buffer.toString("base64url") !== s) throw new Error();
+      return buffer;
+    };
+    const header = JSON.parse(decode(h).toString("utf8"));
+    const claims = JSON.parse(decode(p).toString("utf8"));
+    if (
+      !header ||
+      Array.isArray(header) ||
+      header.alg !== ALG ||
+      header.typ !== "JWT"
+    )
+      throw new Error();
+    const expected = createHmac("sha256", secret).update(`${h}.${p}`).digest();
     const actual = decode(signature);
-    if (actual.length !== expected.length || !timingSafeEqual(actual, expected)) throw new Error();
-    if (!claims || Array.isArray(claims) || claims.iss !== ISS || claims.aud !== AUD) throw new Error();
-    if (!Number.isFinite(claims.exp) || claims.exp <= Math.floor(Date.now()/1000)) throw new Error();
-    if (!Number.isFinite(claims.iat) || claims.iat > Math.floor(Date.now()/1000) + 30) throw new Error();
+    if (actual.length !== expected.length || !timingSafeEqual(actual, expected))
+      throw new Error();
+    if (
+      !claims ||
+      Array.isArray(claims) ||
+      claims.iss !== ISS ||
+      claims.aud !== AUD
+    )
+      throw new Error();
+    if (
+      !Number.isFinite(claims.exp) ||
+      claims.exp <= Math.floor(Date.now() / 1000)
+    )
+      throw new Error();
+    if (
+      !Number.isFinite(claims.iat) ||
+      claims.iat > Math.floor(Date.now() / 1000) + 30
+    )
+      throw new Error();
     if (!Number.isInteger(claims.pv) || claims.pv < 1) throw new Error();
-    for (const key of ['sub', 'org', 'role', 'jti']) if (typeof claims[key] !== 'string' || !claims[key].trim()) throw new Error();
+    for (const key of ["sub", "org", "role", "jti"])
+      if (typeof claims[key] !== "string" || !claims[key].trim())
+        throw new Error();
     return claims;
-  } catch { throw unauthenticated('invalid or expired access token'); }
+  } catch {
+    throw unauthenticated("invalid or expired access token");
+  }
 }
-
 
 // The freshness check (AUTH-DATA-MODEL.md §3). Compares the token's pv against the
 // membership's current perm_version. Note `!==`, not `<`: a token from the future is
 // as suspect as a stale one.
 export function assertFresh(claims, membership) {
-  if (!membership) throw unauthenticated('not a member of this org');
+  if (!membership) throw unauthenticated("not a member of this org");
   if (membership.perm_version !== claims.pv) throw tokenStale();
 }
 
@@ -112,30 +150,31 @@ export function assertFresh(claims, membership) {
 // hash is brute-forceable offline by anyone who reads this file — which defeats the
 // point of hashing a high-entropy token.
 
-export const newRefreshToken = () => randomBytes(32).toString('base64url');
-export const newInviteToken  = () => randomBytes(32).toString('base64url');
+export const newRefreshToken = () => randomBytes(32).toString("base64url");
+export const newInviteToken = () => randomBytes(32).toString("base64url");
 
-const APP_HASH_KEY = process.env.APP_HASH_KEY ?? 'dev-only-app-hash-key-change-me';
+const APP_HASH_KEY =
+  process.env.APP_HASH_KEY ?? "dev-only-app-hash-key-change-me";
 
 export const hashRefreshToken = (raw) =>
-  createHmac('sha256', `${APP_HASH_KEY}:refresh`).update(raw).digest('hex');
+  createHmac("sha256", `${APP_HASH_KEY}:refresh`).update(raw).digest("hex");
 
 export const hashInviteToken = (raw) =>
-  createHmac('sha256', `${APP_HASH_KEY}:invite`).update(raw).digest('hex');
+  createHmac("sha256", `${APP_HASH_KEY}:invite`).update(raw).digest("hex");
 
 // --- passwords --------------------------------------------------------------
 
 export function hashPassword(password) {
-  const salt = randomBytes(16).toString('hex');
-  const derived = scryptSync(password, salt, 64).toString('hex');
+  const salt = randomBytes(16).toString("hex");
+  const derived = scryptSync(password, salt, 64).toString("hex");
   return `scrypt$${salt}$${derived}`;
 }
 
 export function verifyPassword(password, stored) {
-  const [scheme, salt, expected] = String(stored ?? '').split('$');
-  if (scheme !== 'scrypt' || !salt || !expected) return false;
-  const actual = scryptSync(password, salt, 64).toString('hex');
-  const a = Buffer.from(actual, 'hex');
-  const b = Buffer.from(expected, 'hex');
+  const [scheme, salt, expected] = String(stored ?? "").split("$");
+  if (scheme !== "scrypt" || !salt || !expected) return false;
+  const actual = scryptSync(password, salt, 64).toString("hex");
+  const a = Buffer.from(actual, "hex");
+  const b = Buffer.from(expected, "hex");
   return a.length === b.length && timingSafeEqual(a, b);
 }

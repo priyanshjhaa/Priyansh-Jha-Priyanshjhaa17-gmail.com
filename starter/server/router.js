@@ -34,22 +34,29 @@ export function createRouter() {
         }
       }
 
-      if (ok) return { handler: r.handler, params, pattern: r.segments.length ? '/' + r.segments.join('/') : '/' };
+      if (ok)
+        return {
+          handler: r.handler,
+          params,
+          pattern: r.segments.length ? "/" + r.segments.join("/") : "/",
+        };
     }
 
     return null;
   }
 
   return {
-    get: (p, h) => add('GET', p, h),
-    post: (p, h) => add('POST', p, h),
-    patch: (p, h) => add('PATCH', p, h),
-    delete: (p, h) => add('DELETE', p, h),
+    get: (p, h) => add("GET", p, h),
+    post: (p, h) => add("POST", p, h),
+    patch: (p, h) => add("PATCH", p, h),
+    delete: (p, h) => add("DELETE", p, h),
     match,
-    get routes() { return routes; },
+    get routes() {
+      return routes;
+    },
   };
 }
 
 function split(path) {
-  return path.split('/').filter(Boolean);
+  return path.split("/").filter(Boolean);
 }

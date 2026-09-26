@@ -12,3 +12,8 @@ playwright-report/
 
 .DS_Store
 .idea/
+
+# Local configuration and credentials
+.env
+.env.*
+!.env.example

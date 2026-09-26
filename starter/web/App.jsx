@@ -1,116 +1,1547 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { api, mockMode } from './api';
+import React, { useEffect, useRef, useState } from "react";
+import { api, mockMode } from "./api";
 
-const pages = [['devices','Devices','device:list','▦'],['people','People','user:read','♙'],['grants','Grants','user:read','◇'],['sessions','Sessions','session:view','▣'],['audit','Audit log','audit:read','≡'],['admin','Settings','org:update','⚙']];
-const allowed = (permissions, key) => permissions?.[key]?.effect === 'allow';
-const label = key => key.replaceAll('_',' ').replaceAll(':',' / ');
-const stamp = value => value ? new Date(value).toLocaleString() : '—';
-function Notice({ error, testid }) { return error && <div className="notice error" role="alert" data-testid={testid} data-error-code={error.code}>{error.message || String(error)}</div>; }
+const pages = [
+  ["devices", "Devices", "device:list", "▦"],
+  ["people", "People", "user:read", "♙"],
+  ["grants", "Grants", "user:read", "◇"],
+  ["sessions", "Sessions", "session:view", "▣"],
+  ["audit", "Audit log", "audit:read", "≡"],
+  ["admin", "Settings", "org:update", "⚙"],
+];
+const allowed = (permissions, key) => permissions?.[key]?.effect === "allow";
+const label = (key) => key.replaceAll("_", " ").replaceAll(":", " / ");
+const stamp = (value) => (value ? new Date(value).toLocaleString() : "—");
+function Notice({ error, testid }) {
+  return (
+    error && (
+      <div
+        className="notice error"
+        role="alert"
+        data-testid={testid}
+        data-error-code={error.code}
+      >
+        {error.message || String(error)}
+      </div>
+    )
+  );
+}
 function Button({ permission, permissions, testid, children, ...props }) {
-  if (permission && !allowed(permissions,permission)) return null;
-  return <button {...props} data-testid={testid} data-permission={permission} data-state={permission?'unlocked':undefined}>{children}</button>;
+  if (permission && !allowed(permissions, permission)) return null;
+  return (
+    <button
+      {...props}
+      data-testid={testid}
+      data-permission={permission}
+      data-state={permission ? "unlocked" : undefined}
+    >
+      {children}
+    </button>
+  );
 }
-function Field({ label: title, children, ...props }) { return <label className="field"><span>{title}</span>{children || <input {...props}/>}</label>; }
-function Empty({ title='Nothing here yet', children, testid }) { return <div className="empty" data-testid={testid}><span className="empty-icon">◇</span><h3>{title}</h3><p>{children || 'New records will appear here.'}</p></div>; }
+function Field({ label: title, children, ...props }) {
+  return (
+    <label className="field">
+      <span>{title}</span>
+      {children || <input {...props} />}
+    </label>
+  );
+}
+function Empty({ title = "Nothing here yet", children, testid }) {
+  return (
+    <div className="empty" data-testid={testid}>
+      <span className="empty-icon">◇</span>
+      <h3>{title}</h3>
+      <p>{children || "New records will appear here."}</p>
+    </div>
+  );
+}
 function Modal({ title, children, close }) {
-  const ref=useRef(null);
-  useEffect(()=>{ const previous=document.activeElement;ref.current.showModal();return ()=>previous?.focus(); },[]);
-  return <dialog ref={ref} onCancel={close} aria-label={title}><header><h2>{title}</h2><button className="icon-button" onClick={close} aria-label="Close dialog">×</button></header>{children}</dialog>;
+  const ref = useRef(null);
+  useEffect(() => {
+    const previous = document.activeElement;
+    ref.current.showModal();
+    return () => previous?.focus();
+  }, []);
+  return (
+    <dialog ref={ref} onCancel={close} aria-label={title}>
+      <header>
+        <h2>{title}</h2>
+        <button
+          className="icon-button"
+          onClick={close}
+          aria-label="Close dialog"
+        >
+          ×
+        </button>
+      </header>
+      {children}
+    </dialog>
+  );
 }
-function Table({ headings, children }) { return <div className="table-scroll"><table><thead><tr>{headings.map(h=><th key={h}>{h}</th>)}</tr></thead><tbody>{children}</tbody></table></div>; }
+function Table({ headings, children }) {
+  return (
+    <div className="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            {headings.map((h) => (
+              <th key={h}>{h}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>{children}</tbody>
+      </table>
+    </div>
+  );
+}
 
 function Login({ onLogin, initialError }) {
-  const [email,setEmail]=useState(''),[password,setPassword]=useState(''),[error,setError]=useState(initialError),[busy,setBusy]=useState(false);
-  async function submit(event) { event.preventDefault();setError(null);if(!email.trim()||!password){setError({code:'VALIDATION',message:'Enter your email and password.'});return;}setBusy(true);try{onLogin(await api.login({email,password}));}catch(e){setError(e);}finally{setBusy(false);} }
-  return <main className="login"><section className="login-story"><div className="brand"><span className="brand-symbol">r</span> RemoteOps</div><div><span className="eyebrow">YOUR OPERATIONS, IN FOCUS</span><h1>The right access.<br/>In the right hands.</h1><p>One workspace for your devices, people, and permissions. Built for clarity at every level.</p><div className="story-grid"><span>01 <b>Organize your fleet</b></span><span>02 <b>Define access</b></span><span>03 <b>Keep a clear record</b></span></div></div><small>Permission console · Session records only</small></section><section className="login-panel"><form onSubmit={submit} noValidate data-testid="login-form"><span className="eyebrow">WELCOME BACK</span><h2>Sign in to your workspace</h2><p className="muted">Your organizations. Your access. All in one place.</p><Notice error={error} testid="login-error"/><Field label="Email address" type="email" autoComplete="username" placeholder="you@company.com" data-testid="login-email" value={email} onChange={e=>setEmail(e.target.value)}/><Field label="Password" type="password" autoComplete="current-password" placeholder="Enter your password" data-testid="login-password" value={password} onChange={e=>setPassword(e.target.value)}/><button className="primary wide" data-testid="login-submit" disabled={busy}>{busy?'Signing in…':'Sign in →'}</button><div className="demo-note"><b>Explore the demo</b><span>dana@example.test · demo1234</span><small>Try sam@example.test to compare organization access.</small></div>{mockMode&&<p className="mock-label">Development preview · mock responses</p>}</form></section></main>;
+  const [email, setEmail] = useState(""),
+    [password, setPassword] = useState(""),
+    [error, setError] = useState(initialError),
+    [busy, setBusy] = useState(false);
+  async function submit(event) {
+    event.preventDefault();
+    setError(null);
+    if (!email.trim() || !password) {
+      setError({
+        code: "VALIDATION",
+        message: "Enter your email and password.",
+      });
+      return;
+    }
+    setBusy(true);
+    try {
+      onLogin(await api.login({ email, password }));
+    } catch (e) {
+      setError(e);
+    } finally {
+      setBusy(false);
+    }
+  }
+  return (
+    <main className="login">
+      <section className="login-story">
+        <div className="brand">
+          <span className="brand-symbol">r</span> RemoteOps
+        </div>
+        <div>
+          <span className="eyebrow">YOUR OPERATIONS, IN FOCUS</span>
+          <h1>
+            The right access.
+            <br />
+            In the right hands.
+          </h1>
+          <p>
+            One workspace for your devices, people, and permissions. Built for
+            clarity at every level.
+          </p>
+          <div className="story-grid">
+            <span>
+              01 <b>Organize your fleet</b>
+            </span>
+            <span>
+              02 <b>Define access</b>
+            </span>
+            <span>
+              03 <b>Keep a clear record</b>
+            </span>
+          </div>
+        </div>
+        <small>Permission console · Session records only</small>
+      </section>
+      <section className="login-panel">
+        <form onSubmit={submit} noValidate data-testid="login-form">
+          <span className="eyebrow">WELCOME BACK</span>
+          <h2>Sign in to your workspace</h2>
+          <p className="muted">
+            Your organizations. Your access. All in one place.
+          </p>
+          <Notice error={error} testid="login-error" />
+          <Field
+            label="Email address"
+            type="email"
+            autoComplete="username"
+            placeholder="you@company.com"
+            data-testid="login-email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <Field
+            label="Password"
+            type="password"
+            autoComplete="current-password"
+            placeholder="Enter your password"
+            data-testid="login-password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          <button
+            className="primary wide"
+            data-testid="login-submit"
+            disabled={busy}
+          >
+            {busy ? "Signing in…" : "Sign in →"}
+          </button>
+          <div className="demo-note">
+            <b>Explore the demo</b>
+            <span>dana@example.test · demo1234</span>
+            <small>Try sam@example.test to compare organization access.</small>
+          </div>
+          {mockMode && (
+            <p className="mock-label">Development preview · mock responses</p>
+          )}
+        </form>
+      </section>
+    </main>
+  );
 }
 function Invite({ token }) {
-  const [invite,setInvite]=useState(null),[error,setError]=useState(null),[done,setDone]=useState(false);
-  useEffect(()=>{api.request('GET',`/invites/${encodeURIComponent(token)}`).then(setInvite).catch(setError);},[token]);
-  if(done)return <Login onLogin={()=>location.assign('/')}/>;
-  return <main className="invite-page"><section className="card invite-card"><div className="brand"><span className="brand-symbol">r</span> RemoteOps</div><h1>You're invited.</h1><Notice error={error} testid="invite-error"/>{invite&&<form onSubmit={async e=>{e.preventDefault();const data=Object.fromEntries(new FormData(e.currentTarget));try{await api.request('POST',`/invites/${encodeURIComponent(token)}/accept`,data);history.replaceState({},'', '/');setDone(true);}catch(err){setError(err);}}}><p>Join {invite.orgName} as <b data-testid="invite-role">{invite.role}</b>.</p><Field label="Email" data-testid="invite-email" value={invite.email} readOnly/><Field label="Your name" name="name" data-testid="invite-name" required/><Field label="Password" name="password" type="password" minLength={8} data-testid="invite-password" required/><button className="primary" data-testid="invite-submit">Accept invitation</button></form>}</section></main>;
+  const [invite, setInvite] = useState(null),
+    [error, setError] = useState(null),
+    [done, setDone] = useState(false);
+  useEffect(() => {
+    api
+      .request("GET", `/invites/${encodeURIComponent(token)}`)
+      .then(setInvite)
+      .catch(setError);
+  }, [token]);
+  if (done) return <Login onLogin={() => location.assign("/")} />;
+  return (
+    <main className="invite-page">
+      <section className="card invite-card">
+        <div className="brand">
+          <span className="brand-symbol">r</span> RemoteOps
+        </div>
+        <h1>You're invited.</h1>
+        <Notice error={error} testid="invite-error" />
+        {invite && (
+          <form
+            onSubmit={async (e) => {
+              e.preventDefault();
+              const data = Object.fromEntries(new FormData(e.currentTarget));
+              try {
+                await api.request(
+                  "POST",
+                  `/invites/${encodeURIComponent(token)}/accept`,
+                  data,
+                );
+                history.replaceState({}, "", "/");
+                setDone(true);
+              } catch (err) {
+                setError(err);
+              }
+            }}
+          >
+            <p>
+              Join {invite.orgName} as{" "}
+              <b data-testid="invite-role">{invite.role}</b>.
+            </p>
+            <Field
+              label="Email"
+              data-testid="invite-email"
+              value={invite.email}
+              readOnly
+            />
+            <Field
+              label="Your name"
+              name="name"
+              data-testid="invite-name"
+              required
+            />
+            <Field
+              label="Password"
+              name="password"
+              type="password"
+              minLength={8}
+              data-testid="invite-password"
+              required
+            />
+            <button className="primary" data-testid="invite-submit">
+              Accept invitation
+            </button>
+          </form>
+        )}
+      </section>
+    </main>
+  );
 }
 export default function App() {
-  const inviteToken = location.pathname.startsWith('/invite/')?location.pathname.split('/')[2]:null;
-  const [me,setMe]=useState(null),[restoring,setRestoring]=useState(!inviteToken),[bootError,setBootError]=useState(null);
-  useEffect(()=>{if(inviteToken)return;api.restore().then(setMe).catch(e=>{if(e.status!==401)setBootError(e);}).finally(()=>setRestoring(false));},[]);
-  if(inviteToken)return <Invite token={inviteToken}/>;
-  if(restoring)return <main className="boot"><span className="brand-symbol">r</span><p>Opening your workspace…</p></main>;
-  if(!me)return <Login onLogin={setMe} initialError={bootError}/>;
-  return <Workspace me={me} setMe={setMe}/>;
+  const inviteToken = location.pathname.startsWith("/invite/")
+    ? location.pathname.split("/")[2]
+    : null;
+  const [me, setMe] = useState(null),
+    [restoring, setRestoring] = useState(!inviteToken),
+    [bootError, setBootError] = useState(null);
+  useEffect(() => {
+    if (inviteToken) return;
+    api
+      .restore()
+      .then(setMe)
+      .catch((e) => {
+        if (e.status !== 401) setBootError(e);
+      })
+      .finally(() => setRestoring(false));
+  }, []);
+  if (inviteToken) return <Invite token={inviteToken} />;
+  if (restoring)
+    return (
+      <main className="boot">
+        <span className="brand-symbol">r</span>
+        <p>Opening your workspace…</p>
+      </main>
+    );
+  if (!me) return <Login onLogin={setMe} initialError={bootError} />;
+  return <Workspace me={me} setMe={setMe} />;
 }
 function Workspace({ me, setMe }) {
-  const [page,setPage]=useState('devices'),[data,setData]=useState({}),[catalogue,setCatalogue]=useState({roles:[],permissions:[],patterns:[]}),[error,setError]=useState(null),[notice,setNotice]=useState(''),[loading,setLoading]=useState(true),[modal,setModal]=useState(null),[search,setSearch]=useState(''),[version,setVersion]=useState(0),[switching,setSwitching]=useState(false);
-  const epoch=useRef(0),permissions=me.permissions, org=me.org || me.orgs.find(o=>o.id===me.orgId), prefix=`/orgs/${org.id}`;
-  const visiblePages=pages.filter(([id,,p])=>allowed(permissions,p)||(id==='admin'&&allowed(permissions,'org:delete')));
-  const current=visiblePages.find(([id])=>id===page)?.[0] || visiblePages[0]?.[0] || 'none';
-  useEffect(()=>{api.request('GET','/catalogue').then(setCatalogue).catch(setError);},[]);
-  useEffect(()=>{
-    const id=++epoch.current;setData({});setLoading(true);setError(null);setSearch('');
-    const get=path=>api.request('GET',prefix+path);
-    const load=async()=>{
-      if(current==='devices')return get('/devices');
-      if(current==='people'){const members=await get('/members');return {...members,...(allowed(permissions,'user:invite')?await get('/invites'):{invites:[]})};}
-      if(current==='grants'){const grants=await get('/grants');return {...grants,...await get('/members'),...(allowed(permissions,'device:list')?await get('/devices'):{devices:[]})};}
-      if(current==='sessions')return {...await get('/sessions'),...(allowed(permissions,'device:list')?await get('/devices'):{devices:[]})};
-      if(current==='audit')return get('/audit?limit=200');
+  const [page, setPage] = useState("devices"),
+    [data, setData] = useState({}),
+    [catalogue, setCatalogue] = useState({
+      roles: [],
+      permissions: [],
+      patterns: [],
+    }),
+    [error, setError] = useState(null),
+    [notice, setNotice] = useState(""),
+    [loading, setLoading] = useState(true),
+    [modal, setModal] = useState(null),
+    [search, setSearch] = useState(""),
+    [version, setVersion] = useState(0),
+    [switching, setSwitching] = useState(false);
+  const epoch = useRef(0),
+    permissions = me.permissions,
+    org = me.org || me.orgs.find((o) => o.id === me.orgId),
+    prefix = `/orgs/${org.id}`;
+  const visiblePages = pages.filter(
+    ([id, , p]) =>
+      allowed(permissions, p) ||
+      (id === "admin" && allowed(permissions, "org:delete")),
+  );
+  const current =
+    visiblePages.find(([id]) => id === page)?.[0] ||
+    visiblePages[0]?.[0] ||
+    "none";
+  useEffect(() => {
+    api.request("GET", "/catalogue").then(setCatalogue).catch(setError);
+  }, []);
+  useEffect(() => {
+    const id = ++epoch.current;
+    setData({});
+    setLoading(true);
+    setError(null);
+    setSearch("");
+    const get = (path) => api.request("GET", prefix + path);
+    const load = async () => {
+      const fresh = await api.request("GET", "/auth/me");
+      if (id !== epoch.current) return {};
+      setMe(fresh);
+      if (current === "devices") return get("/devices");
+      if (current === "people") {
+        const members = await get("/members");
+        return {
+          ...members,
+          ...(allowed(permissions, "user:invite")
+            ? await get("/invites")
+            : { invites: [] }),
+        };
+      }
+      if (current === "grants") {
+        const grants = await get("/grants");
+        return {
+          ...grants,
+          ...(await get("/members")),
+          ...(allowed(permissions, "device:list")
+            ? await get("/devices")
+            : { devices: [] }),
+        };
+      }
+      if (current === "sessions")
+        return {
+          ...(await get("/sessions")),
+          ...(allowed(permissions, "device:list")
+            ? await get("/devices")
+            : { devices: [] }),
+        };
+      if (current === "audit") return get("/audit?limit=200");
       return {};
     };
-    load().then(result=>{if(id===epoch.current)setData(result);}).catch(e=>{if(id===epoch.current)setError(e);}).finally(()=>{if(id===epoch.current)setLoading(false);});
-    return ()=>{epoch.current++;};
-  },[org.id,current,version]);
-  function navigate(id){epoch.current++;setData({});setLoading(true);setPage(id);setModal(null);setNotice('');}
-  async function changeOrg(id){if(switching)return;epoch.current++;setData({});setLoading(true);setModal(null);setSwitching(true);setError(null);try{const next=await api.switchOrg(id);setMe(next);setPage('devices');setVersion(v=>v+1);}catch(e){setError(e);setVersion(v=>v+1);}finally{setSwitching(false);}}
-  async function mutate(method,path,body,message='Changes saved') {setError(null);try{const result=await api.request(method,path,body);setModal(null);setNotice(message);const fresh=await api.request('GET','/auth/me');setMe(fresh);setVersion(v=>v+1);return result;}catch(e){setError(e);throw e;}}
-  const act=fn=>()=>{Promise.resolve().then(fn).catch(()=>{});};
-  const gate=(p,testid,text,onClick,extra={})=><Button permission={p} permissions={permissions} testid={testid} onClick={act(onClick)} {...extra}>{text}</Button>;
-  const createOrg=async()=>{const name=prompt('Name your new organization');if(!name?.trim())return;const created=await api.request('POST','/orgs',{name,theme:['cobalt','forest','violet'][(me.orgs?.length||0)%3]});await changeOrg(created.id);};
-  const filtered=rows=>(rows||[]).filter(row=>!search||JSON.stringify(row).toLowerCase().includes(search.toLowerCase()));
-  const start=async(d,mode)=>{await mutate('POST',prefix+'/sessions',{deviceId:d.id,mode},`${label(mode)} session record started`);};
-  const confirmMutation=(text,method,path,body)=>{if(confirm(text))return mutate(method,path,body);};
-  const theme=org.theme==='forest'||org.theme==='emerald'?'forest':org.theme==='violet'||org.theme==='plum'?'violet':'cobalt';
-  return <div className={`app theme-${theme}`} data-testid="app-shell" data-org-id={org.id} data-org-theme={org.theme}>
-    <aside className="sidebar"><div className="brand"><span className="brand-symbol">r</span> RemoteOps<span className="version">01</span></div><div className="workspace-label">WORKSPACES</div><div className="org-list">{me.orgs.map(o=><button key={o.id} className={`org-option ${org.id===o.id?'selected':''}`} data-testid="org-option" data-org-id={o.id} onClick={()=>changeOrg(o.id)} disabled={switching}><span className="org-avatar">{o.name[0]}</span><span>{o.name}<small>{o.id===org.id?'Current workspace':'Switch workspace'}</small></span>{o.id===org.id&&<span className="org-dot"/>}</button>)}</div><button className="create-org" data-testid="create-org" onClick={act(createOrg)}>＋ Create organization</button><div className="workspace-label">WORKSPACE</div><nav>{visiblePages.map(([id,title,p,icon])=><button key={id} className={current===id?'active':''} data-testid={`nav-${id}`} data-permission={id==='admin'&&!allowed(permissions,p)?'org:delete':p} data-state="unlocked" onClick={()=>navigate(id)}><span className="nav-icon">{icon}</span>{title}{current===id&&<span className="nav-indicator"/>}</button>)}</nav><div className="sidebar-bottom"><div className="record-note"><span>◉</span><p><b>A clear record of access</b><small>Sessions are records. No remote connections are established.</small></p></div><div className="profile"><span className="avatar">{(me.user?.name||'You').slice(0,1)}</span><div><b>{me.user?.name||'Your account'}</b><small data-testid="active-role">{me.role}</small></div><button aria-label="Sign out" title="Sign out" onClick={async()=>{try{await api.logout();}catch{}setMe(null);}}>↪</button></div></div></aside>
-    <main className="main"><header className="topbar"><span>{org.name} <span className="slash">/</span> {pages.find(p=>p[0]===current)?.[1]||'Workspace'}</span><span className="status-pill"><i/>{mockMode?'Mock preview':'Workspace connected'}</span></header><div className="content"><div className="page-heading"><div><span className="eyebrow">WORKSPACE OVERVIEW</span><h1>{pages.find(p=>p[0]===current)?.[1]||'Your workspace'}</h1><p>{({devices:'A clear view of your fleet and the access you hold.',people:'The people behind your operations. Access with intention.',grants:'Give the right access, with a clear scope and lifetime.',sessions:'Track authorized activity from start to finish.',audit:'Every action leaves a record. Follow the details here.',admin:'Make this workspace your own.'})[current]}</p></div><div className="heading-actions"><button onClick={()=>setVersion(v=>v+1)} aria-label="Refresh workspace">↻ Refresh</button>{current==='devices'&&gate('device:provision','add-device','＋ Add device',()=>setModal({type:'device'}),{className:'primary'})}{current==='people'&&gate('user:invite','invite-user','＋ Invite person',()=>setModal({type:'invite'}),{className:'primary'})}{current==='grants'&&gate('grant:create','new-grant','＋ New grant',()=>setModal({type:'grant'}),{className:'primary'})}{current==='sessions'&&gate('session:start','new-session','＋ Start session',()=>setModal({type:'session'}),{className:'primary'})}</div></div>
-    <Notice error={error}/>{notice&&<div className="notice success" role="status">✓ {notice}<button aria-label="Dismiss notification" onClick={()=>setNotice('')}>×</button></div>}
-    {current==='devices'&&!loading&&<div className="stats"><div><span>Visible devices</span><strong>{data.devices?.length||0}<small>in this workspace</small></strong></div><div><span>Online now</span><strong>{data.devices?.filter(d=>d.online).length||0}<small><i className="dot"/> ready to access</small></strong></div><div><span>Your access</span><strong className="role-stat">{me.role}<small>Resolved per device</small></strong></div></div>}
-    {loading||switching?<div className="card skeleton" role="status">Loading workspace…</div>:<>
-    {['devices','people','grants','sessions','audit'].includes(current)&&<section className="card"><div className="card-toolbar"><h2>{({devices:'Device inventory',people:'Workspace members',grants:'Permission grants',sessions:'Session history',audit:'Activity history'})[current]}</h2><input className="search" aria-label="Search current records" placeholder="⌕  Search records…" value={search} onChange={e=>setSearch(e.target.value)}/></div>
-    {current==='devices'&&(data.devices?.length?<Table headings={['Device','Status','Platform','Available actions']}>{filtered(data.devices).map(d=><tr key={d.id} data-testid="device-row" data-device-id={d.id}><td><div className="cell-name"><span className="device-icon">{d.kind==='linux'?'⌘':d.kind==='macos'?'▱':'▦'}</span><span><b>{d.name}</b><small>{d.id}</small></span></div></td><td><span className={`badge ${d.online?'online':'neutral'}`}><i/>{d.online?'Online':'Offline'}</span></td><td><span className="platform">{d.kind}</span></td><td><div className="row-actions">{[['view','View'],['control','Control'],['terminal','Terminal']].map(([mode,title])=><Button key={mode} permission={`device:${mode}`} permissions={d.permissions} testid={`start-${mode}`} onClick={act(()=>start(d,mode))}>{title} ↗</Button>)}<Button permission="device:file_transfer" permissions={d.permissions} testid="transfer-files" onClick={()=>setNotice('File-transfer permission is available. This assignment does not perform real file transfers.')}>Files</Button><Button permission="device:update" permissions={d.permissions} testid="rename-device" onClick={()=>setModal({type:'device',item:d})}>Rename</Button><Button permission="device:provision" permissions={d.permissions} testid="transfer-device" onClick={()=>setModal({type:'transfer',item:d})}>Transfer</Button><Button permission="device:provision" permissions={d.permissions} testid="decommission-device" className="danger-text" onClick={act(()=>confirmMutation(`Decommission ${d.name}? Active sessions will end.`,'DELETE',prefix+`/devices/${d.id}`))}>Decommission</Button></div></td></tr>)}</Table>:<Empty title="Your fleet starts here" testid="devices-empty">Add a device to begin organizing this workspace.</Empty>)}
-    {current==='people'&&<Table headings={['Person','Role','Status','Actions']}>{filtered(data.members).map(m=><tr key={m.user_id} data-testid="user-row" data-user-id={m.user_id}><td><b>{m.name}</b><small>{m.email}</small></td><td>{allowed(permissions,'user:role:update')?<select aria-label={`Role for ${m.name}`} data-testid="role-select" data-permission="user:role:update" data-state="unlocked" value={m.role} onChange={e=>mutate('PATCH',prefix+`/members/${m.user_id}`,{role:e.target.value}).catch(()=>{})}>{catalogue.roles.map(r=><option key={r.key} value={r.key}>{r.label}</option>)}</select>:<span className="badge neutral">{m.role}</span>}</td><td>{m.status}</td><td><div className="row-actions"><button onClick={act(async()=>setModal({type:'effective',item:await api.request('GET',prefix+`/users/${m.user_id}/effective`)}))}>Permissions</button>{gate('user:remove','suspend-user',m.status==='suspended'?'Reinstate':'Suspend',()=>confirmMutation(`${m.status==='suspended'?'Reinstate':'Suspend'} ${m.name}?`,m.status==='suspended'?'DELETE':'POST',prefix+`/members/${m.user_id}/suspend`,{}))}{gate('user:remove','remove-user','Remove',()=>confirmMutation(`Remove ${m.name} from this workspace?`,'DELETE',prefix+`/members/${m.user_id}`),{className:'danger-text'})}</div></td></tr>)}</Table>}
-    {current==='grants'&&(data.grants?.length?<Table headings={['Recipient / scope','Permissions','Effect','Window','Actions']}>{filtered(data.grants).map(g=><tr key={g.id} data-testid="grant-row" data-effect={g.effect}><td><b>{data.members?.find(m=>m.user_id===g.user_id)?.name||g.user_id}</b><small>{g.device_id||'All devices · organization'}</small></td><td>{(g.permissions||[]).join(', ')}</td><td><span className={`badge ${g.effect==='allow'?'online':'denied'}`}>{g.effect}</span></td><td><small>{g.starts_at?stamp(g.starts_at):'Immediately'}<br/>{g.expires_at?stamp(g.expires_at):'No expiry'}</small></td><td>{gate('grant:revoke','revoke-grant','Revoke',()=>confirmMutation('Revoke this grant? Existing sessions keep their original expiry.','DELETE',prefix+`/grants/${g.id}`))}</td></tr>)}</Table>:<Empty title="No permission overrides">Role baselines currently define access.</Empty>)}
-    {current==='sessions'&&(data.sessions?.length?<Table headings={['Session','Mode','State','Expires','Actions']}>{filtered(data.sessions).map(s=><tr key={s.id} data-testid="session-row"><td><b>{data.devices?.find(d=>d.id===s.device_id)?.name||s.device_id}</b><small>{s.user_id}</small></td><td>{s.mode}</td><td><span className={`badge ${s.state==='active'?'online':'neutral'}`}>{s.state}</span></td><td>{stamp(s.expires_at)}<small>{s.end_reason}</small></td><td><div className="row-actions"><button onClick={act(async()=>setModal({type:'sessionDetail',item:await api.request('GET',`/sessions/${s.id}`)}))}>Details</button>{s.state==='active'&&(s.user_id===me.user.id||allowed(permissions,'session:terminate'))&&<button data-testid="stop-session" data-permission={s.user_id===me.user.id?undefined:'session:terminate'} data-state="unlocked" onClick={act(()=>mutate('DELETE',`/sessions/${s.id}`))}>Stop</button>}</div></td></tr>)}</Table>:<Empty title="No sessions yet">Session records appear when an authorized action starts.</Empty>)}
-    {current==='audit'&&(data.events?.length?<Table headings={['Action','Actor / target','Result','Reason','Time']}>{filtered(data.events).map(e=><tr key={e.id} data-testid="audit-row"><td><b>{label(e.action)}</b><small>{e.request_id}</small></td><td>{e.actor_id||'System'}<small>{e.target_id||'—'}</small></td><td><span className={`badge ${e.result==='allow'?'online':'denied'}`}>{e.result}</span></td><td>{e.reason_code||'—'}</td><td>{stamp(e.at)}</td></tr>)}</Table>:<Empty title="A clean slate">Workspace activity will be recorded here.</Empty>)}
-    <div className="table-footer"><span>Organization-scoped records</span><span>Permissions resolved by the server ↗</span></div></section>}
-    {current==='people'&&allowed(permissions,'user:invite')&&<section className="card secondary-card"><div className="card-toolbar"><h2>Pending invitations</h2></div>{data.invites?.length?<Table headings={['Email','Role','Expires','Actions']}>{data.invites.map(i=><tr key={i.id}><td>{i.email}</td><td>{i.role}</td><td>{stamp(i.expires_at)}</td><td><button onClick={act(()=>confirmMutation('Revoke this invitation?','DELETE',prefix+`/invites/${i.id}`))}>Revoke</button></td></tr>)}</Table>:<Empty title="No pending invitations"/>}</section>}
-    {current==='admin'&&<section className="card settings"><span className="org-avatar large">{org.name[0]}</span><h2>{org.name}</h2><p className="muted">Workspace identity and lifecycle</p>{gate('org:update','rename-org','Edit organization',()=>setModal({type:'org',item:org}),{className:'primary'})}<hr/><h3>Organization lifecycle</h3><p>Deleting the organization ends its sessions and removes access. Historical records are retained.</p>{gate('org:delete','delete-org','Delete organization',async()=>{if(confirm(`Delete ${org.name}? This cannot be undone in the console.`)){await api.request('DELETE',prefix);const remaining=me.orgs.filter(o=>o.id!==org.id);if(remaining.length)await changeOrg(remaining[0].id);else{await api.logout();setMe(null);}}},{className:'danger'})}</section>}
-    {current==='none'&&<Empty title="No accessible sections">Ask an organization owner to review your permissions.</Empty>}
-    </>}
-    <footer className="page-footer"><span>REMOTEOPS <span className="footer-dot">•</span> Access, with accountability.</span><button className="text-button" onClick={act(async()=>{if(confirm('Leave this organization?')){await api.request('DELETE',prefix+'/members/me');const remaining=me.orgs.filter(o=>o.id!==org.id);if(remaining.length)await changeOrg(remaining[0].id);else{await api.logout();setMe(null);}}})}>Leave organization</button></footer></div></main>
-    {modal&&<Modal title={({device:modal.item?'Rename device':'Add a device',invite:'Invite a teammate',grant:'New permission grant',session:'Start a session record',transfer:'Transfer device',org:'Organization settings',effective:'Effective permissions',sessionDetail:'Session details',inviteToken:'Invitation created'})[modal.type]} close={()=>setModal(null)}><Notice error={error}/><Editor modal={modal} data={data} catalogue={catalogue} orgs={me.orgs} orgId={org.id} submit={async body=>{
-      const type=modal.type,item=modal.item;
-      if(type==='device')return mutate(item?'PATCH':'POST',prefix+'/devices'+(item?`/${item.id}`:''),body);
-      if(type==='org')return mutate('PATCH',prefix,body);
-      if(type==='transfer')return mutate('POST',prefix+`/devices/${item.id}/transfer`,body);
-      if(type==='invite'){const result=await mutate('POST',prefix+'/invites',body,'Invitation created');setModal({type:'inviteToken',item:result});return;}
-      if(type==='grant')return mutate('POST',prefix+'/grants',body);
-      if(type==='session')return mutate('POST',prefix+'/sessions',body);
-    }}/></Modal>}
-  </div>;
+    load()
+      .then((result) => {
+        if (id === epoch.current) setData(result);
+      })
+      .catch((e) => {
+        if (id === epoch.current) setError(e);
+      })
+      .finally(() => {
+        if (id === epoch.current) setLoading(false);
+      });
+    return () => {
+      epoch.current++;
+    };
+  }, [org.id, current, version]);
+  function navigate(id) {
+    setVersion((v) => v + 1);
+    epoch.current++;
+    setData({});
+    setLoading(true);
+    setPage(id);
+    setModal(null);
+    setNotice("");
+  }
+  async function changeOrg(id) {
+    if (switching) return;
+    epoch.current++;
+    setData({});
+    setLoading(true);
+    setModal(null);
+    setSwitching(true);
+    setError(null);
+    try {
+      const next = await api.switchOrg(id);
+      setMe(next);
+      setPage("devices");
+      setVersion((v) => v + 1);
+    } catch (e) {
+      setError(e);
+      setVersion((v) => v + 1);
+    } finally {
+      setSwitching(false);
+    }
+  }
+  async function mutate(method, path, body, message = "Changes saved") {
+    setError(null);
+    try {
+      const result = await api.request(method, path, body);
+      setModal(null);
+      setNotice(message);
+      const fresh = await api.request("GET", "/auth/me");
+      setMe(fresh);
+      setVersion((v) => v + 1);
+      return result;
+    } catch (e) {
+      setError(e);
+      throw e;
+    }
+  }
+  const act = (fn) => () => {
+    Promise.resolve().then(fn).catch(setError);
+  };
+  const gate = (p, testid, text, onClick, extra = {}) => (
+    <Button
+      permission={p}
+      permissions={permissions}
+      testid={testid}
+      onClick={act(onClick)}
+      {...extra}
+    >
+      {text}
+    </Button>
+  );
+  const createOrg = async () => {
+    const name = prompt("Name your new organization");
+    if (!name?.trim()) return;
+    const created = await api.request("POST", "/orgs", {
+      name,
+      theme: ["cobalt", "forest", "violet"][(me.orgs?.length || 0) % 3],
+    });
+    await changeOrg(created.id);
+  };
+  const filtered = (rows) =>
+    (rows || []).filter(
+      (row) =>
+        !search ||
+        JSON.stringify(row).toLowerCase().includes(search.toLowerCase()),
+    );
+  const start = async (d, mode) => {
+    await mutate(
+      "POST",
+      prefix + "/sessions",
+      { deviceId: d.id, mode },
+      `${label(mode)} session record started`,
+    );
+  };
+  const confirmMutation = (text, method, path, body) => {
+    if (confirm(text)) return mutate(method, path, body);
+  };
+  const theme = org.theme;
+  const hue = [...org.theme].reduce(
+    (n, c) => (n * 31 + c.charCodeAt(0)) % 360,
+    0,
+  );
+  const colors =
+    org.theme === "cobalt"
+      ? {}
+      : {
+          backgroundColor: `hsl(${hue} 25% 96%)`,
+          "--accent": `hsl(${hue} 30% 35%)`,
+          "--accent-dark": `hsl(${hue} 30% 26%)`,
+          "--tint": `hsl(${hue} 25% 92%)`,
+        };
+  return (
+    <div
+      className={`app theme-${theme}`}
+      style={colors}
+      data-testid="app-shell"
+      data-org-id={org.id}
+      data-org-theme={org.theme}
+    >
+      <aside className="sidebar">
+        <div className="brand">
+          <span className="brand-symbol">r</span> RemoteOps
+          <span className="version">01</span>
+        </div>
+        <div className="workspace-label">WORKSPACES</div>
+        <div className="org-list">
+          {me.orgs.map((o) => (
+            <button
+              key={o.id}
+              className={`org-option ${org.id === o.id ? "selected" : ""}`}
+              data-testid="org-option"
+              data-org-id={o.id}
+              onClick={() => changeOrg(o.id)}
+              disabled={switching}
+            >
+              <span className="org-avatar">{o.name[0]}</span>
+              <span>
+                {o.name}
+                <small>
+                  {o.id === org.id ? "Current workspace" : "Switch workspace"}
+                </small>
+              </span>
+              {o.id === org.id && <span className="org-dot" />}
+            </button>
+          ))}
+        </div>
+        <button
+          className="create-org"
+          data-testid="create-org"
+          onClick={act(createOrg)}
+        >
+          ＋ Create organization
+        </button>
+        <div className="workspace-label">WORKSPACE</div>
+        <nav>
+          {visiblePages.map(([id, title, p, icon]) => (
+            <button
+              key={id}
+              className={current === id ? "active" : ""}
+              data-testid={`nav-${id}`}
+              data-permission={
+                id === "admin" && !allowed(permissions, p) ? "org:delete" : p
+              }
+              data-state="unlocked"
+              onClick={() => navigate(id)}
+            >
+              <span className="nav-icon">{icon}</span>
+              {title}
+              {current === id && <span className="nav-indicator" />}
+            </button>
+          ))}
+        </nav>
+        <div className="sidebar-bottom">
+          <div className="record-note">
+            <span>◉</span>
+            <p>
+              <b>A clear record of access</b>
+              <small>
+                Sessions are records. No remote connections are established.
+              </small>
+            </p>
+          </div>
+          <div className="profile">
+            <span className="avatar">
+              {(me.user?.name || "You").slice(0, 1)}
+            </span>
+            <div>
+              <b>{me.user?.name || "Your account"}</b>
+              <small data-testid="active-role">{me.role}</small>
+            </div>
+            <button
+              aria-label="Sign out"
+              title="Sign out"
+              onClick={async () => {
+                try {
+                  await api.logout();
+                } catch {}
+                setMe(null);
+              }}
+            >
+              ↪
+            </button>
+          </div>
+        </div>
+      </aside>
+      <main className="main">
+        <header className="topbar">
+          <span>
+            {org.name} <span className="slash">/</span>{" "}
+            {pages.find((p) => p[0] === current)?.[1] || "Workspace"}
+          </span>
+          <span className="status-pill">
+            <i />
+            {mockMode ? "Mock preview" : "Workspace connected"}
+          </span>
+        </header>
+        <div className="content">
+          <div className="page-heading">
+            <div>
+              <span className="eyebrow">WORKSPACE OVERVIEW</span>
+              <h1>
+                {pages.find((p) => p[0] === current)?.[1] || "Your workspace"}
+              </h1>
+              <p>
+                {
+                  {
+                    devices:
+                      "A clear view of your fleet and the access you hold.",
+                    people:
+                      "The people behind your operations. Access with intention.",
+                    grants:
+                      "Give the right access, with a clear scope and lifetime.",
+                    sessions: "Track authorized activity from start to finish.",
+                    audit:
+                      "Every action leaves a record. Follow the details here.",
+                    admin: "Make this workspace your own.",
+                  }[current]
+                }
+              </p>
+            </div>
+            <div className="heading-actions">
+              <button
+                onClick={() => setVersion((v) => v + 1)}
+                aria-label="Refresh workspace"
+              >
+                ↻ Refresh
+              </button>
+              {current === "devices" &&
+                gate(
+                  "device:provision",
+                  "add-device",
+                  "＋ Add device",
+                  () => setModal({ type: "device" }),
+                  { className: "primary" },
+                )}
+              {current === "people" &&
+                gate(
+                  "user:invite",
+                  "invite-user",
+                  "＋ Invite person",
+                  () => setModal({ type: "invite" }),
+                  { className: "primary" },
+                )}
+              {current === "grants" &&
+                gate(
+                  "grant:create",
+                  "new-grant",
+                  "＋ New grant",
+                  () => setModal({ type: "grant" }),
+                  { className: "primary" },
+                )}
+              {current === "sessions" &&
+                gate(
+                  "session:start",
+                  "new-session",
+                  "＋ Start session",
+                  () => setModal({ type: "session" }),
+                  { className: "primary" },
+                )}
+            </div>
+          </div>
+          <Notice error={error} />
+          {notice && (
+            <div className="notice success" role="status">
+              ✓ {notice}
+              <button
+                aria-label="Dismiss notification"
+                onClick={() => setNotice("")}
+              >
+                ×
+              </button>
+            </div>
+          )}
+          {current === "devices" && !loading && (
+            <div className="stats">
+              <div>
+                <span>Visible devices</span>
+                <strong>
+                  {data.devices?.length || 0}
+                  <small>in this workspace</small>
+                </strong>
+              </div>
+              <div>
+                <span>Online now</span>
+                <strong>
+                  {data.devices?.filter((d) => d.online).length || 0}
+                  <small>
+                    <i className="dot" /> ready to access
+                  </small>
+                </strong>
+              </div>
+              <div>
+                <span>Your access</span>
+                <strong className="role-stat">
+                  {me.role}
+                  <small>Resolved per device</small>
+                </strong>
+              </div>
+            </div>
+          )}
+          {loading || switching ? (
+            <div className="card skeleton" role="status">
+              Loading workspace…
+            </div>
+          ) : (
+            <>
+              {["devices", "people", "grants", "sessions", "audit"].includes(
+                current,
+              ) && (
+                <section className="card">
+                  <div className="card-toolbar">
+                    <h2>
+                      {
+                        {
+                          devices: "Device inventory",
+                          people: "Workspace members",
+                          grants: "Permission grants",
+                          sessions: "Session history",
+                          audit: "Activity history",
+                        }[current]
+                      }
+                    </h2>
+                    <input
+                      className="search"
+                      aria-label="Search current records"
+                      placeholder="⌕  Search records…"
+                      value={search}
+                      onChange={(e) => setSearch(e.target.value)}
+                    />
+                  </div>
+                  {current === "devices" &&
+                    (data.devices?.length ? (
+                      <Table
+                        headings={[
+                          "Device",
+                          "Status",
+                          "Platform",
+                          "Available actions",
+                        ]}
+                      >
+                        {filtered(data.devices).map((d) => (
+                          <tr
+                            key={d.id}
+                            data-testid="device-row"
+                            data-device-id={d.id}
+                          >
+                            <td>
+                              <div className="cell-name">
+                                <span className="device-icon">
+                                  {d.kind === "linux"
+                                    ? "⌘"
+                                    : d.kind === "macos"
+                                      ? "▱"
+                                      : "▦"}
+                                </span>
+                                <span>
+                                  <b>{d.name}</b>
+                                  <small>{d.id}</small>
+                                </span>
+                              </div>
+                            </td>
+                            <td>
+                              <span
+                                className={`badge ${d.online ? "online" : "neutral"}`}
+                              >
+                                <i />
+                                {d.online ? "Online" : "Offline"}
+                              </span>
+                            </td>
+                            <td>
+                              <span className="platform">{d.kind}</span>
+                            </td>
+                            <td>
+                              <div className="row-actions">
+                                {[
+                                  ["view", "View"],
+                                  ["control", "Control"],
+                                  ["terminal", "Terminal"],
+                                ].map(([mode, title]) => (
+                                  <Button
+                                    key={mode}
+                                    permission={`device:${mode}`}
+                                    permissions={d.permissions}
+                                    testid={`start-${mode}`}
+                                    onClick={act(() => start(d, mode))}
+                                  >
+                                    {title} ↗
+                                  </Button>
+                                ))}
+                                <Button
+                                  permission="device:file_transfer"
+                                  permissions={d.permissions}
+                                  testid="transfer-files"
+                                  onClick={() =>
+                                    setNotice(
+                                      "File-transfer permission is available. This assignment does not perform real file transfers.",
+                                    )
+                                  }
+                                >
+                                  Files
+                                </Button>
+                                <Button
+                                  permission="device:update"
+                                  permissions={d.permissions}
+                                  testid="rename-device"
+                                  onClick={() =>
+                                    setModal({ type: "device", item: d })
+                                  }
+                                >
+                                  Rename
+                                </Button>
+                                <Button
+                                  permission="device:provision"
+                                  permissions={d.permissions}
+                                  testid="transfer-device"
+                                  onClick={() =>
+                                    setModal({ type: "transfer", item: d })
+                                  }
+                                >
+                                  Transfer
+                                </Button>
+                                <Button
+                                  permission="device:provision"
+                                  permissions={d.permissions}
+                                  testid="decommission-device"
+                                  className="danger-text"
+                                  onClick={act(() =>
+                                    confirmMutation(
+                                      `Decommission ${d.name}? Active sessions will end.`,
+                                      "DELETE",
+                                      prefix + `/devices/${d.id}`,
+                                    ),
+                                  )}
+                                >
+                                  Decommission
+                                </Button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </Table>
+                    ) : (
+                      <Empty
+                        title="Your fleet starts here"
+                        testid="devices-empty"
+                      >
+                        Add a device to begin organizing this workspace.
+                      </Empty>
+                    ))}
+                  {current === "people" && (
+                    <Table headings={["Person", "Role", "Status", "Actions"]}>
+                      {filtered(data.members).map((m) => (
+                        <tr
+                          key={m.user_id}
+                          data-testid="user-row"
+                          data-user-id={m.user_id}
+                        >
+                          <td>
+                            <b>{m.name}</b>
+                            <small>{m.email}</small>
+                          </td>
+                          <td>
+                            {allowed(permissions, "user:role:update") ? (
+                              <select
+                                aria-label={`Role for ${m.name}`}
+                                data-testid="role-select"
+                                data-permission="user:role:update"
+                                data-state="unlocked"
+                                value={m.role}
+                                onChange={(e) =>
+                                  mutate(
+                                    "PATCH",
+                                    prefix + `/members/${m.user_id}`,
+                                    { role: e.target.value },
+                                  ).catch(() => {})
+                                }
+                              >
+                                {catalogue.roles.map((r) => (
+                                  <option key={r.key} value={r.key}>
+                                    {r.label}
+                                  </option>
+                                ))}
+                              </select>
+                            ) : (
+                              <span className="badge neutral">{m.role}</span>
+                            )}
+                          </td>
+                          <td>{m.status}</td>
+                          <td>
+                            <div className="row-actions">
+                              <button
+                                onClick={act(async () =>
+                                  setModal({
+                                    type: "effective",
+                                    item: await api.request(
+                                      "GET",
+                                      prefix + `/users/${m.user_id}/effective`,
+                                    ),
+                                  }),
+                                )}
+                              >
+                                Permissions
+                              </button>
+                              {gate(
+                                "user:remove",
+                                "suspend-user",
+                                m.status === "suspended"
+                                  ? "Reinstate"
+                                  : "Suspend",
+                                () =>
+                                  confirmMutation(
+                                    `${m.status === "suspended" ? "Reinstate" : "Suspend"} ${m.name}?`,
+                                    m.status === "suspended"
+                                      ? "DELETE"
+                                      : "POST",
+                                    prefix + `/members/${m.user_id}/suspend`,
+                                    {},
+                                  ),
+                              )}
+                              {gate(
+                                "user:remove",
+                                "remove-user",
+                                "Remove",
+                                () =>
+                                  confirmMutation(
+                                    `Remove ${m.name} from this workspace?`,
+                                    "DELETE",
+                                    prefix + `/members/${m.user_id}`,
+                                  ),
+                                { className: "danger-text" },
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </Table>
+                  )}
+                  {current === "grants" &&
+                    (data.grants?.length ? (
+                      <Table
+                        headings={[
+                          "Recipient / scope",
+                          "Permissions",
+                          "Effect",
+                          "Window",
+                          "Actions",
+                        ]}
+                      >
+                        {filtered(data.grants).map((g) => (
+                          <tr
+                            key={g.id}
+                            data-testid="grant-row"
+                            data-effect={g.effect}
+                          >
+                            <td>
+                              <b>
+                                {data.members?.find(
+                                  (m) => m.user_id === g.user_id,
+                                )?.name || g.user_id}
+                              </b>
+                              <small>
+                                {g.device_id || "All devices · organization"}
+                              </small>
+                            </td>
+                            <td>{(g.permissions || []).join(", ")}</td>
+                            <td>
+                              <span
+                                className={`badge ${g.effect === "allow" ? "online" : "denied"}`}
+                              >
+                                {g.effect}
+                              </span>
+                            </td>
+                            <td>
+                              <small>
+                                {g.starts_at
+                                  ? stamp(g.starts_at)
+                                  : "Immediately"}
+                                <br />
+                                {g.expires_at
+                                  ? stamp(g.expires_at)
+                                  : "No expiry"}
+                              </small>
+                            </td>
+                            <td>
+                              {gate(
+                                "grant:revoke",
+                                "revoke-grant",
+                                "Revoke",
+                                () =>
+                                  confirmMutation(
+                                    "Revoke this grant? Existing sessions keep their original expiry.",
+                                    "DELETE",
+                                    prefix + `/grants/${g.id}`,
+                                  ),
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </Table>
+                    ) : (
+                      <Empty title="No permission overrides">
+                        Role baselines currently define access.
+                      </Empty>
+                    ))}
+                  {current === "sessions" &&
+                    (data.sessions?.length ? (
+                      <Table
+                        headings={[
+                          "Session",
+                          "Mode",
+                          "State",
+                          "Expires",
+                          "Actions",
+                        ]}
+                      >
+                        {filtered(data.sessions).map((s) => (
+                          <tr key={s.id} data-testid="session-row">
+                            <td>
+                              <b>
+                                {data.devices?.find((d) => d.id === s.device_id)
+                                  ?.name || s.device_id}
+                              </b>
+                              <small>{s.user_id}</small>
+                            </td>
+                            <td>{s.mode}</td>
+                            <td>
+                              <span
+                                className={`badge ${s.state === "active" ? "online" : "neutral"}`}
+                              >
+                                {s.state}
+                              </span>
+                            </td>
+                            <td>
+                              {stamp(s.expires_at)}
+                              <small>{s.end_reason}</small>
+                            </td>
+                            <td>
+                              <div className="row-actions">
+                                <button
+                                  onClick={act(async () =>
+                                    setModal({
+                                      type: "sessionDetail",
+                                      item: await api.request(
+                                        "GET",
+                                        `/sessions/${s.id}`,
+                                      ),
+                                    }),
+                                  )}
+                                >
+                                  Details
+                                </button>
+                                {s.state === "active" &&
+                                  (s.user_id === me.user.id ||
+                                    allowed(
+                                      permissions,
+                                      "session:terminate",
+                                    )) && (
+                                    <button
+                                      data-testid="stop-session"
+                                      data-permission={
+                                        s.user_id === me.user.id
+                                          ? undefined
+                                          : "session:terminate"
+                                      }
+                                      data-state="unlocked"
+                                      onClick={act(() =>
+                                        mutate("DELETE", `/sessions/${s.id}`),
+                                      )}
+                                    >
+                                      Stop
+                                    </button>
+                                  )}
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </Table>
+                    ) : (
+                      <Empty title="No sessions yet">
+                        Session records appear when an authorized action starts.
+                      </Empty>
+                    ))}
+                  {current === "audit" &&
+                    (data.events?.length ? (
+                      <Table
+                        headings={[
+                          "Action",
+                          "Actor / target",
+                          "Result",
+                          "Reason",
+                          "Time",
+                        ]}
+                      >
+                        {filtered(data.events).map((e) => (
+                          <tr key={e.id} data-testid="audit-row">
+                            <td>
+                              <b>{label(e.action)}</b>
+                              <small>{e.request_id}</small>
+                            </td>
+                            <td>
+                              {e.actor_id || "System"}
+                              <small>{e.target_id || "—"}</small>
+                            </td>
+                            <td>
+                              <span
+                                className={`badge ${e.result === "allow" ? "online" : "denied"}`}
+                              >
+                                {e.result}
+                              </span>
+                            </td>
+                            <td>{e.reason_code || "—"}</td>
+                            <td>{stamp(e.at)}</td>
+                          </tr>
+                        ))}
+                      </Table>
+                    ) : (
+                      <Empty title="A clean slate">
+                        Workspace activity will be recorded here.
+                      </Empty>
+                    ))}
+                  <div className="table-footer">
+                    <span>Organization-scoped records</span>
+                    <span>Permissions resolved by the server ↗</span>
+                  </div>
+                </section>
+              )}
+              {current === "people" && allowed(permissions, "user:invite") && (
+                <section className="card secondary-card">
+                  <div className="card-toolbar">
+                    <h2>Pending invitations</h2>
+                  </div>
+                  {data.invites?.length ? (
+                    <Table headings={["Email", "Role", "Expires", "Actions"]}>
+                      {data.invites.map((i) => (
+                        <tr key={i.id}>
+                          <td>{i.email}</td>
+                          <td>{i.role}</td>
+                          <td>{stamp(i.expires_at)}</td>
+                          <td>
+                            <button
+                              onClick={act(() =>
+                                confirmMutation(
+                                  "Revoke this invitation?",
+                                  "DELETE",
+                                  prefix + `/invites/${i.id}`,
+                                ),
+                              )}
+                            >
+                              Revoke
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </Table>
+                  ) : (
+                    <Empty title="No pending invitations" />
+                  )}
+                </section>
+              )}
+              {current === "admin" && (
+                <section className="card settings">
+                  <span className="org-avatar large">{org.name[0]}</span>
+                  <h2>{org.name}</h2>
+                  <p className="muted">Workspace identity and lifecycle</p>
+                  {gate(
+                    "org:update",
+                    "rename-org",
+                    "Edit organization",
+                    () => setModal({ type: "org", item: org }),
+                    { className: "primary" },
+                  )}
+                  <hr />
+                  <h3>Organization lifecycle</h3>
+                  <p>
+                    Deleting the organization ends its sessions and removes
+                    access. Historical records are retained.
+                  </p>
+                  {gate(
+                    "org:delete",
+                    "delete-org",
+                    "Delete organization",
+                    async () => {
+                      if (
+                        confirm(
+                          `Delete ${org.name}? This cannot be undone in the console.`,
+                        )
+                      ) {
+                        await api.request("DELETE", prefix);
+                        const remaining = me.orgs.filter(
+                          (o) => o.id !== org.id,
+                        );
+                        if (remaining.length) await changeOrg(remaining[0].id);
+                        else {
+                          await api.logout();
+                          setMe(null);
+                        }
+                      }
+                    },
+                    { className: "danger" },
+                  )}
+                </section>
+              )}
+              {current === "none" && (
+                <Empty title="No accessible sections">
+                  Ask an organization owner to review your permissions.
+                </Empty>
+              )}
+            </>
+          )}
+          <footer className="page-footer">
+            <span>
+              REMOTEOPS <span className="footer-dot">•</span> Access, with
+              accountability.
+            </span>
+            <button
+              className="text-button"
+              onClick={act(async () => {
+                if (confirm("Leave this organization?")) {
+                  await api.request("DELETE", prefix + "/members/me");
+                  const remaining = me.orgs.filter((o) => o.id !== org.id);
+                  if (remaining.length) await changeOrg(remaining[0].id);
+                  else {
+                    await api.logout();
+                    setMe(null);
+                  }
+                }
+              })}
+            >
+              Leave organization
+            </button>
+          </footer>
+        </div>
+      </main>
+      {modal && (
+        <Modal
+          title={
+            {
+              device: modal.item ? "Rename device" : "Add a device",
+              invite: "Invite a teammate",
+              grant: "New permission grant",
+              session: "Start a session record",
+              transfer: "Transfer device",
+              org: "Organization settings",
+              effective: "Effective permissions",
+              sessionDetail: "Session details",
+              inviteToken: "Invitation created",
+            }[modal.type]
+          }
+          close={() => setModal(null)}
+        >
+          <Notice error={error} />
+          <Editor
+            modal={modal}
+            data={data}
+            catalogue={catalogue}
+            orgs={me.orgs}
+            orgId={org.id}
+            submit={async (body) => {
+              const type = modal.type,
+                item = modal.item;
+              if (type === "device")
+                return mutate(
+                  item ? "PATCH" : "POST",
+                  prefix + "/devices" + (item ? `/${item.id}` : ""),
+                  body,
+                );
+              if (type === "org") return mutate("PATCH", prefix, body);
+              if (type === "transfer")
+                return mutate(
+                  "POST",
+                  prefix + `/devices/${item.id}/transfer`,
+                  body,
+                );
+              if (type === "invite") {
+                const result = await mutate(
+                  "POST",
+                  prefix + "/invites",
+                  body,
+                  "Invitation created",
+                );
+                setModal({ type: "inviteToken", item: result });
+                return;
+              }
+              if (type === "grant")
+                return mutate("POST", prefix + "/grants", body);
+              if (type === "session")
+                return mutate("POST", prefix + "/sessions", body);
+            }}
+          />
+        </Modal>
+      )}
+    </div>
+  );
 }
 function Editor({ modal, data, catalogue, orgs, orgId, submit }) {
-  const [busy,setBusy]=useState(false),type=modal.type,item=modal.item;
-  if(type==='effective')return <div className="permission-list">{Object.entries(item.permissions).map(([key,p])=><div key={key}><b>{key}</b><span className={`badge ${p.effect==='allow'?'online':'denied'}`}>{p.effect}</span><small>{p.source||'No grant'} · {p.reason||'Granted'}</small></div>)}</div>;
-  if(type==='sessionDetail')return <dl className="details">{Object.entries(item).map(([k,v])=><React.Fragment key={k}><dt>{label(k)}</dt><dd>{typeof v==='object'?JSON.stringify(v,null,2):String(v??'—')}</dd></React.Fragment>)}</dl>;
-  if(type==='inviteToken')return <div><p>Copy this invitation now. The credential is only returned once.</p><textarea readOnly value={`${location.origin}/invite/${item.inviteToken}`} aria-label="Invitation link"/><p className="muted">Share only with the intended recipient. It expires in seven days.</p></div>;
-  async function send(e){e.preventDefault();setBusy(true);const f=new FormData(e.currentTarget),body=Object.fromEntries(f);if(type==='grant'){body.permissions=f.getAll('permissions');body.deviceId=body.deviceId||null;body.startsAt=body.startsAt?new Date(body.startsAt).toISOString():null;body.expiresAt=body.expiresAt?new Date(body.expiresAt).toISOString():null;}if(type==='org')body.maxSessionMinutes=Number(body.maxSessionMinutes);try{await submit(body);}catch{}finally{setBusy(false);}}
-  return <form onSubmit={send} className="editor">
-    {type==='device'&&<><Field label="Device name" name="name" defaultValue={item?.name} required maxLength={120}/>{!item&&<Field label="Platform"><select name="kind">{['macos','windows','linux','android','ios'].map(k=><option key={k}>{k}</option>)}</select></Field>}</>}
-    {type==='invite'&&<><Field label="Email address" name="email" type="email" required/><Field label="Role"><select name="role" defaultValue="viewer">{catalogue.roles.map(r=><option key={r.key} value={r.key}>{r.label}</option>)}</select></Field></>}
-    {type==='transfer'&&<><p>The destination requires provisioning permission too. Active sessions will end.</p><Field label="Destination"><select name="orgId" required>{orgs.filter(o=>o.id!==orgId).map(o=><option key={o.id} value={o.id}>{o.name}</option>)}</select></Field></>}
-    {type==='org'&&<><Field label="Organization name" name="name" defaultValue={item.name} required maxLength={120}/><Field label="Accent"><select name="theme" defaultValue={item.theme}>{[...new Set([item.theme,'cobalt','forest','violet'])].map(t=><option key={t}>{t}</option>)}</select></Field><Field label="Maximum session duration (minutes)" name="maxSessionMinutes" type="number" min="1" max="1440" defaultValue={item.max_session_minutes||60}/></>}
-    {type==='grant'&&<><div className="form-grid"><Field label="Recipient"><select name="userId" data-testid="grant-user" required>{data.members?.filter(m=>m.status==='active').map(m=><option key={m.user_id} value={m.user_id}>{m.name} · {m.role}</option>)}</select></Field><Field label="Effect"><select name="effect" data-testid="grant-effect"><option>allow</option><option>deny</option></select></Field></div><Field label="Scope"><select name="deviceId" data-testid="grant-device"><option value="">Organization-wide</option>{data.devices?.map(d=><option key={d.id} value={d.id}>{d.name}</option>)}</select></Field><fieldset><legend>Permissions</legend><div className="checks">{catalogue.patterns.map(p=><label key={p}><input name="permissions" type="checkbox" value={p} data-permission-key={p}/>{p}</label>)}</div></fieldset><div className="form-grid"><Field label="Starts (optional)" name="startsAt" type="datetime-local"/><Field label="Expires (optional)" name="expiresAt" type="datetime-local"/></div><p className="muted">Deny overrides allow. You can only grant authority you hold at this scope.</p></>}
-    {type==='session'&&<><Field label="Device"><select name="deviceId" required>{data.devices?.map(d=><option key={d.id} value={d.id}>{d.name}</option>)}</select></Field><Field label="Session mode"><select name="mode"><option>view</option><option>control</option><option>terminal</option></select></Field><p className="muted">This creates a session record. It does not connect to the device.</p></>}
-    <div className="form-footer"><button className="primary" data-testid={type==='grant'?'grant-submit':undefined} disabled={busy}>{busy?'Saving…':type==='grant'?'Create grant':type==='invite'?'Create invitation':'Save changes'}</button></div>
-  </form>;
+  const [busy, setBusy] = useState(false),
+    type = modal.type,
+    item = modal.item;
+  if (type === "effective")
+    return (
+      <div className="permission-list">
+        {Object.entries(item.permissions).map(([key, p]) => (
+          <div key={key}>
+            <b>{key}</b>
+            <span
+              className={`badge ${p.effect === "allow" ? "online" : "denied"}`}
+            >
+              {p.effect}
+            </span>
+            <small>
+              {p.source || "No grant"} · {p.reason || "Granted"}
+            </small>
+          </div>
+        ))}
+      </div>
+    );
+  if (type === "sessionDetail")
+    return (
+      <dl className="details">
+        {Object.entries(item).map(([k, v]) => (
+          <React.Fragment key={k}>
+            <dt>{label(k)}</dt>
+            <dd>
+              {typeof v === "object"
+                ? JSON.stringify(v, null, 2)
+                : String(v ?? "—")}
+            </dd>
+          </React.Fragment>
+        ))}
+      </dl>
+    );
+  if (type === "inviteToken")
+    return (
+      <div>
+        <p>Copy this invitation now. The credential is only returned once.</p>
+        <textarea
+          readOnly
+          value={`${location.origin}/invite/${item.inviteToken}`}
+          aria-label="Invitation link"
+        />
+        <p className="muted">
+          Share only with the intended recipient. It expires in seven days.
+        </p>
+      </div>
+    );
+  async function send(e) {
+    e.preventDefault();
+    setBusy(true);
+    const f = new FormData(e.currentTarget),
+      body = Object.fromEntries(f);
+    if (type === "grant") {
+      body.permissions = f.getAll("permissions");
+      body.deviceId = body.deviceId || null;
+      body.startsAt = body.startsAt
+        ? new Date(body.startsAt).toISOString()
+        : null;
+      body.expiresAt = body.expiresAt
+        ? new Date(body.expiresAt).toISOString()
+        : null;
+    }
+    if (type === "org") body.maxSessionMinutes = Number(body.maxSessionMinutes);
+    try {
+      await submit(body);
+    } catch {
+    } finally {
+      setBusy(false);
+    }
+  }
+  return (
+    <form onSubmit={send} className="editor">
+      {type === "device" && (
+        <>
+          <Field
+            label="Device name"
+            name="name"
+            defaultValue={item?.name}
+            required
+            maxLength={120}
+          />
+          {!item && (
+            <Field label="Platform">
+              <select name="kind">
+                {["macos", "windows", "linux", "android", "ios"].map((k) => (
+                  <option key={k}>{k}</option>
+                ))}
+              </select>
+            </Field>
+          )}
+        </>
+      )}
+      {type === "invite" && (
+        <>
+          <Field label="Email address" name="email" type="email" required />
+          <Field label="Role">
+            <select name="role" defaultValue="viewer">
+              {catalogue.roles.map((r) => (
+                <option key={r.key} value={r.key}>
+                  {r.label}
+                </option>
+              ))}
+            </select>
+          </Field>
+        </>
+      )}
+      {type === "transfer" && (
+        <>
+          <p>
+            The destination requires provisioning permission too. Active
+            sessions will end.
+          </p>
+          <Field label="Destination">
+            <select name="orgId" required>
+              {orgs
+                .filter((o) => o.id !== orgId)
+                .map((o) => (
+                  <option key={o.id} value={o.id}>
+                    {o.name}
+                  </option>
+                ))}
+            </select>
+          </Field>
+        </>
+      )}
+      {type === "org" && (
+        <>
+          <Field
+            label="Organization name"
+            name="name"
+            defaultValue={item.name}
+            required
+            maxLength={120}
+          />
+          <Field label="Accent">
+            <select name="theme" defaultValue={item.theme}>
+              {[...new Set([item.theme, "cobalt", "forest", "violet"])].map(
+                (t) => (
+                  <option key={t}>{t}</option>
+                ),
+              )}
+            </select>
+          </Field>
+          <Field
+            label="Maximum session duration (minutes)"
+            name="maxSessionMinutes"
+            type="number"
+            min="1"
+            max="1440"
+            defaultValue={item.max_session_minutes || 60}
+          />
+        </>
+      )}
+      {type === "grant" && (
+        <>
+          <div className="form-grid">
+            <Field label="Recipient">
+              <select name="userId" data-testid="grant-user" required>
+                {data.members
+                  ?.filter((m) => m.status === "active")
+                  .map((m) => (
+                    <option key={m.user_id} value={m.user_id}>
+                      {m.name} · {m.role}
+                    </option>
+                  ))}
+              </select>
+            </Field>
+            <Field label="Effect">
+              <select name="effect" data-testid="grant-effect">
+                <option>allow</option>
+                <option>deny</option>
+              </select>
+            </Field>
+          </div>
+          <Field label="Scope">
+            <select name="deviceId" data-testid="grant-device">
+              <option value="">Organization-wide</option>
+              {data.devices?.map((d) => (
+                <option key={d.id} value={d.id}>
+                  {d.name}
+                </option>
+              ))}
+            </select>
+          </Field>
+          <fieldset>
+            <legend>Permissions</legend>
+            <div className="checks">
+              {catalogue.patterns.map((p) => (
+                <label key={p}>
+                  <input
+                    name="permissions"
+                    type="checkbox"
+                    value={p}
+                    data-permission-key={p}
+                  />
+                  {p}
+                </label>
+              ))}
+            </div>
+          </fieldset>
+          <div className="form-grid">
+            <Field
+              label="Starts (optional)"
+              name="startsAt"
+              type="datetime-local"
+            />
+            <Field
+              label="Expires (optional)"
+              name="expiresAt"
+              type="datetime-local"
+            />
+          </div>
+          <p className="muted">
+            Deny overrides allow. You can only grant authority you hold at this
+            scope.
+          </p>
+        </>
+      )}
+      {type === "session" && (
+        <>
+          <Field label="Device">
+            <select name="deviceId" required>
+              {data.devices?.map((d) => (
+                <option key={d.id} value={d.id}>
+                  {d.name}
+                </option>
+              ))}
+            </select>
+          </Field>
+          <Field label="Session mode">
+            <select name="mode">
+              <option>view</option>
+              <option>control</option>
+              <option>terminal</option>
+            </select>
+          </Field>
+          <p className="muted">
+            This creates a session record. It does not connect to the device.
+          </p>
+        </>
+      )}
+      <div className="form-footer">
+        <button
+          className="primary"
+          data-testid={type === "grant" ? "grant-submit" : undefined}
+          disabled={busy}
+        >
+          {busy
+            ? "Saving…"
+            : type === "grant"
+              ? "Create grant"
+              : type === "invite"
+                ? "Create invitation"
+                : "Save changes"}
+        </button>
+      </div>
+    </form>
+  );
 }

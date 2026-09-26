@@ -51,3 +51,16 @@
 - **Why:** The partial index filters accepted_at/revoked_at, not expires_at; its existence alone does not prevent accepting the same row twice.
 - **Rejected:** Trusting prose about the index without inspecting its predicate.
 - **Reconsider if:** The immutable schema contract changes to encode these transitions.
+
+## Authorization is checked inside the mutation transaction
+- **Choice:** Reauthenticate after acquiring the write transaction and clear request-local permission inputs.
+- **Why:** Reading HTTP bodies yields; another request may revoke authority before the first request is ready to mutate.
+- **Rejected:** Treating an earlier middleware check as authority for the entire request regardless of interleaving.
+- **Reconsider if:** A request pipeline obtains and holds an equivalent consistent authorization snapshot through mutation.
+
+## Local typography and readable source
+- **Choice:** Bundle DM Sans and Manrope through Fontsource; format implementation with Prettier.
+- **Why:** External font requests can delay the initial render, and readable source supports the required walkthrough.
+- **Rejected:** Runtime Google Fonts CSS and compressed source.
+- **Reconsider if:** Asset measurements warrant system fonts alone.
+- **Sources:** https://fontsource.org/fonts/dm-sans and https://fontsource.org/fonts/manrope (font files); https://prettier.io/ (development formatting).

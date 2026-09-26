@@ -1,172 +1,76 @@
-# RemoteOps — hiring hackathon
+# RemoteOps
 
-Two-day take-home. One application: a multi-org permission console.
+A multi-organization permission console built from the Rhinostream candidate starter. React dashboard, Node HTTP API, and SQLite in one process. Sessions are authorization records only; no remote connections, input injection, screen capture, shell execution, or file transfers occur.
 
-The candidate-facing material describes behaviour, not mechanism: what the permission model does,
-what the interface returns, and which elements the console has. How to build it, how to structure
-it, and how it looks are the candidate's decisions. The database schema is the ground truth;
-where a document and the schema disagree, the schema wins.
+## Run from a clean checkout
 
-This file is for organisers. It records what ships, what must be removed before it does, and
-which packaging problems are still open. It is the only file here written for us rather than for
-the candidate.
-
----
-
-## The application
-
-`q1-starter/` is the application: one process, one port, one command.
+Node.js 22+ and npm are required. Tested with Node 25.8.1 on macOS. Run from the repository root:
 
 ```sh
-cd q1-starter
-npm install
-npm run db:reset     # schema + reference data + demo fixture
-npm run dev          # http://localhost:8080
+cd starter && npm install && npm run db:reset && npm run dev
 ```
 
-Its own README carries the given-versus-yours file split, the demo fixture, the test commands,
-the speed expectation, and the `PRAGMA foreign_keys` trap.
+Open http://localhost:8080. The reset command is for first setup/testing and **deletes the local app database**. On subsequent launches use `cd starter && npm run dev`.
 
----
-
-## What the candidate builds
-
-Everything under `server/routes/`, all of `web/`, the four server modules the routes stand on
-(`context.js`, `permissions.js`, `lifecycle.js`, `audit.js`), and `verifyAccessToken` in
-`server/auth.js`, which ships as a stub.
-
-## Time box
-
-Two days. Commit as you go — the history is read, and it is the primary evidence the work is
-theirs. Ends with a walkthrough in which the candidate explains their decisions and modifies
-their own code live.
-
-## How it is graded
-
-| Weight | Artifact | What it measures |
+| Demo login | Password | Organizations |
 |---|---|---|
-| 50% | the code, against a hidden tier | that it works |
-| 30% | `BUILD-LOG.md` + `DECISIONS.md` | **that they understand it** |
-| 20% | the live walkthrough | that the two agree |
+| dana@example.test | demo1234 | Owner in Acme; viewer in Globex |
+| sam@example.test | demo1234 | Operator in Acme; auditor in Globex |
+| admin@acme.test | demo1234 | Administrator in Acme |
+| viewer@acme.test | demo1234 | Viewer in Acme |
 
-The middle third is the part that makes the other two trustworthy. The candidate-facing half is
-`DISCOVERY-BRIEF.md`, which ships inside `starter/` along with templates for both documents. It
-asks for *method* — a wrong prediction, a reversed decision, an observation that changed their
-model, a rejected alternative and why it fails — and never enumerates the concepts themselves,
-because discovering them is the exercise.
+The loader also prints the personalized fixture account. Roles and permissions are read from the database; the undocumented catalogue entries work without source edits.
 
-Two mechanisms do the work, and neither depends on trusting prose:
+## Verify
 
-1. **The log must grow alongside the code, in its own commits.** `git log --follow --
-   BUILD-LOG.md` next to the code commits says whether the candidate produced a record or a
-   story. A log delivered in one commit at the end is capped at *Adequate* however well it reads.
-2. **The live round is drawn from the candidate's own log.** We sample their entries at random and
-   ask them to go deeper, take a rejected alternative, and open the line that makes a decision.
-   A log they cannot defend is a log they did not write.
-
-The 20% verifies the 30% rather than standing alone: an indefensible candidate scores *Weak* on
-the write-up, and if they cannot account for submitted code, the artifact score is capped too —
-not as punishment, but because the work cannot be attributed.
-
-`DISCOVERY-RUBRIC.md` (organiser-only) carries the concept list, the scoring bands, the
-fabrication checks to run before reading a word, and the live-round script.
-
----
-
-## What ships
-
-| Path | Ships? |
-|---|---|
-| `BRIEF.md`, `PERMISSIONS.md`, `AUTH-DATA-MODEL.md`, `UI-INVENTORY.md` | ✅ candidate-facing |
-| `WORKFLOW.md` | ✅ candidate-facing — currently untracked, add it before packaging |
-| `starter/DISCOVERY-BRIEF.md` | ✅ candidate-facing — installs into the hand-out with the templates |
-| `DISCOVERY-RUBRIC.md` | ❌ organiser-only: the reflection answer key and the live-round script |
-| `q1-starter/` | ✅ the candidate repo — regenerate `starter/` with `tools/strip-starter.mjs` |
-| `starter/` | ✅ the generated hand-out — never hand-edited |
-| `tools/` | ❌ organiser-only: the strip, the fixture generator, the overlay proof |
-| `candidates/` | ❌ organiser-only: per-candidate hand-outs and manifests (gitignored) |
-| `HACKATHON-PLAN.md` | ❌ organiser-only: scoring internals, anti-cheat, calibration |
-| the rest of `evaluate/` | ❌ evaluator-only: the hidden tier, the rubric, and the answer keys |
-
----
-
-## Strip the starter before handing it out
-
-**`q1-starter/` is the reference implementation, not a starter.** The rest of the answer is in
-the tree, so it must not go out as-is. This is now automated and reproducible:
+From `starter/`:
 
 ```sh
-node tools/strip-starter.mjs          # q1-starter/ -> starter/  (the hand-out)
-node tools/new-candidate.mjs <id>     # starter/ -> candidates/<id>/ with a unique fixture
+node scripts/check-jwt.js
+node scripts/check-permissions.js
+node scripts/check-api.js
+npm run build
+npx playwright install chromium
+npx playwright test
+npm run personalisation
+npm run check:hardening
+npm run measure
 ```
 
-The strip removes every file the candidate writes (`web/` except a placeholder entry,
-`server/{permissions,context,lifecycle,audit}.js`, `server/routes/*.js`, and the candidate's own
-`NOTES.md`), replaces them with throwing stubs so the process still boots and the shipped suites
-still run, re-stubs `verifyAccessToken`, and installs the personalisation overlay. See
-`HARDENING.md`.
+The four requested submission summaries are JWT, permissions, API, and Playwright. Extra hardening and personalization checks supplement them. See `VERIFICATION.md` for actual recorded results and limitations.
 
-Do not hand-edit `starter/` — it is generated. Change `tools/templates/` or the reference tree
-and re-run the strip.
+## Frontend preview and production build
 
-### The personalisation overlay
-
-Every hand-out gets one extra organization that appears in no document: an undocumented role, an
-undocumented permission, a per-candidate baseline, and a device-scoped `allow` and `deny` of that
-permission on two different devices. It is **strictly additive** — it never touches the two
-documented organizations — because the shipped suites assert exact counts
-(`check-api.js:54`, `:92`; `ui.spec.js:129`, `:192`, `:234`) and a non-additive overlay would make
-every candidate look broken.
-
-Grading must run with a **different nonce** than the one shipped, so the values a candidate can
-read in `scripts/personalise.js` cannot be baked in:
+The default UI uses the real API. For an explicit development preview only:
 
 ```sh
-CANDIDATE_NONCE="grade/$ID/$(date +%s)" ...
+VITE_USE_MOCK_API=true npm run dev
 ```
 
-`node tools/verify-overlay.mjs` proves the overlay is non-perturbing: it loads the overlay into the
-reference tree and asserts all four shipped suites still pass (35 + 43 + 66 + 25). Re-run it
-after any change to the overlay, the fixtures, or the suites.
+Mock login accepts a populated email and `demo1234`. Mock responses are development fixtures, not an authorization implementation. Production builds exclude the mock module.
 
----
+```sh
+npm run build
+npm start
+```
 
-## Still open (hardening)
+Before exposing the application beyond local testing, set `JWT_SECRET` and `APP_HASH_KEY` to separate random secrets and serve over HTTPS. Existing starter defaults are local demo values, not production credentials. Refresh cookies use Secure, HttpOnly, and SameSite=Strict. Modern browsers support Secure cookies on localhost; use HTTPS for non-localhost hosts. Optional variables: `PORT` (8080), `DATABASE_FILE` (app.db), `CANDIDATE_NONCE` (personalization override).
 
-Three changes from the same review are **not** implemented here and are the ones that defeat a
-blind prompt rather than a careless candidate:
+## Architecture and behavior
 
-1. Replace the prose algorithm (`WORKFLOW.md:34`, `PERMISSIONS.md §4`) with a sealed
-   pass/fail oracle, so the resolution order has to be inferred rather than read.
-2. Build the hidden tier around the seams the specs leave open — offboard/rehire, self-transfer,
-   suspension on ungated routes, malformed-token fuzzing, cross-scope laundering, concurrent
-   inserts against the partial unique index.
+- `starter/web/`: React screens, accessible forms, organization identity, and interchangeable API adapters. Buttons render from the server's resolved permission set; there is no role matrix in React.
+- `starter/server/permissions.js`: database-driven permission resolver, deny precedence, wildcard/time/device scope, batched device resolution, and grant authority checks. Request-local reuse only.
+- `starter/server/routes/`: published API plus read-only catalogue and logout endpoints. Scoped queries hide foreign resources. Mutation transactions recheck identity after request-body reads.
+- `starter/server/lifecycle.js`: last-owner protection, session expiry and tenancy cascades. Permission changes invalidate future requests but preserve existing session snapshots until TTL.
+- SQLite schema, foreign keys, partial indexes, and append-only audit triggers are retained unchanged. Successful mutations and their audit events share a transaction; denied attempts are logged after rollback.
+- Refresh rotation is serialized in-tab and, when available, across browser tabs with Web Locks. Access tokens remain in memory; refresh and invitation credentials are hashed at rest.
 
-Both are compatible with candidates discovering the concepts themselves; the oracle withholds an
-answer, it does not withhold an observation. Deliberately NOT proposed: making the documents
-vaguer, which breaks the fixed contracts the tests read, and declaring a no-AI rule, which is
-unenforceable and punishes honest candidates. The graded write-up plus the live round is the
-enforcement mechanism instead — see `DISCOVERY-RUBRIC.md`.
+The original candidate specifications remain at the root. Reference solution and organizer-only material are excluded from the current submission tree; upstream history remains intact.
 
----
+## Work record and authorship
 
-## Open packaging items
+Solo submitter: Priyansh Jha. Implementation was assisted by OpenAI Codex. `BUILD-LOG.md` records actual agent work and verification as it occurred; `DECISIONS.md` cites tools and explains choices and alternatives. The submitter must review, understand, and be able to modify every submitted line without assistance in the live walkthrough.
 
-1. **Documentation citations are stale.** The candidate-facing specs are trimmed versions of the
-   pre-trim originals kept in `evaluate/reference/`. Several code comments, and the first line of
-   `scripts/check-permissions.js`, still cite section numbers that only exist in the full
-   versions. Either align the numbering or update the citations before the repo is handed over.
+## Deliberate boundaries
 
-2. **Assertion counts disagree across the organiser notes.** The public UI suite now has 25
-   tests, including three added for sign-in failure feedback; the older notes still say 19 or
-   22. State the sizes once, in one place, or not at all.
-
-3. **Sign-in failure feedback is now graded.** `login-error` is part of the console inventory,
-   asserted by three public UI cases, and covered by hidden tier I (10 backend assertions) plus a
-   seven-case `failure feedback — sign-in` block in the hidden UI matrix. The evaluation plan and
-   runbook now carry the new counts (51 backend, 121 UI); `FEEDBACK_CASES` in `eval.sh` must
-   track the UI block if it changes.
-
-4. **Suite sizes are runtime counts, not line counts.** One public suite contains a six-way loop
-   behind a single call, so grepping for assertions returns a smaller number than a run reports.
-   Anyone re-counting that way will get a different figure and may "fix" it.
+No real remote access, email service, password-reset system, or deployment is included. Invite links are returned once for the intended recipient. Audit shows the most recent 200 records in the UI; the API supports validated pagination. Search filters the fetched page locally. The schema and reference catalogue are not editable through the console.

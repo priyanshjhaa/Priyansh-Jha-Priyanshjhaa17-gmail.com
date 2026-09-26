@@ -21,3 +21,18 @@ This is the contemporaneous implementation record. Entries describe observed wor
 - Implemented all published route groups plus catalogue and logout. First API run after wiring: 66 passed, 0 failed. Personalized fixture: 18 passed, 0 failed.
 - Observed two schema details requiring explicit transactional handling: invitation uniqueness does not account for time expiry; refresh replay revocation would roll back if an exception escaped its transaction. Expired invitations are retired on replacement, and replay rejection is returned from the transaction then thrown after commit.
 - Full browser suite is now testing the real HTTP adapter. Mock preview success was not counted toward these checks.
+- Browser testing found an incorrect visual assumption: unknown themes fell back to cobalt, so Acme/cobalt and Globex/amber rendered the same background. Replaced the fallback with deterministic theme-derived colors, retaining a distinct accent/background for arbitrary theme strings.
+- Browser failures exposed a second frontend bug: a fixed-height flex sidebar shrank the organization list until the create button intercepted its clicks. Preserved child heights and made the sidebar scroll, rather than forcing clicks in tests. Also corrected error propagation for direct actions and refresh of navigation permissions on each screen fetch.
+- Corrected frontend run: all 25 supplied browser tests pass (15.2 seconds). Additional API hardening: 42 assertions pass.
+- Review found a concurrency gap beyond public tests: authentication ran before the asynchronous request-body read. A queued mutation could retain pre-revocation context. Mutations now authenticate again after obtaining their write transaction.
+- Removed external font loading in favor of locally bundled Fontsource fonts; repeated navigation now deliberately refreshes instead of leaving a loading state without an effect trigger.
+- Full extended UI run: 30/30 passed in 10.1 seconds (the original 25 plus five independent workflow checks). Added a final desktop screenshot/performance record test.
+- Batched resolver measurement over 20 runs: 5 queries at 10/100/500 devices; means 0.13/0.30/1.21 ms on this machine. This measures resolution, not a promise of constant total response time.
+- Delayed-body revocation test passes; hardening now totals 44 assertions.
+- Excluded inherited reference implementation and organizer-only files from the current branch tree without reading their code or rewriting upstream history. Replaced the organizer README with candidate startup/verification documentation.
+
+## Phase 3 — Final verification (2026-09-27)
+- After usage reset, resumed the previously blocked approval requests and reran the latest code. JWT 43/43; permissions 35/35; API 66/66; browser 31/31 (10.3 s); hardening 44 assertions. Both supplied and independent personalization nonces pass 18 assertions.
+- Browser measurement: login screen 50 ms; sign-in to first device 123 ms. Saved the actual test screenshot to artifacts/dashboard.png.
+- Formatting and whitespace checks pass. Database schema/reference files are unchanged from upstream.
+- GitHub authentication check still reports no signed-in hosts; publishing is pending. No submission form has been sent.
