@@ -37,6 +37,6 @@ Hardening covers malformed credentials, future permission versions, cross-org re
 ## Submission status
 
 - Local implementation, original test suites, supplementary checks, and documentation: complete.
-- Fresh-checkout execution: cloned implementation commit `4b508e5` into a new temporary directory, ran the documented command verbatim, and verified homepage 200, login 200, and an authenticated device list with five records. Dependency installation reported zero vulnerabilities.
+- Fresh-checkout execution: anonymously cloned current public `main` at commit `b3056b7` into a new temporary directory, ran the documented install/reset/development commands on the default port, and verified homepage 200, login 200, and an authenticated device list with five records. Dependency installation reported zero vulnerabilities.
 - Public personal repository: pushed with unsquashed history to `https://github.com/priyanshjhaa/Priyansh-Jha-Priyanshjhaa17-gmail.com`. Anonymous Git can read `main`; anonymous raw requests for `BUILD-LOG.md` and `DECISIONS.md` both return HTTP 200.
-- Form: all verified text fields are prepared but not submitted. The user must provide the registered phone number and personally confirm the declarations, including their ability to explain and modify every submitted line.
+- Form: not submitted and intentionally deferred. The user must provide the registered phone number and personally confirm the declarations, including their ability to explain and modify every submitted line.

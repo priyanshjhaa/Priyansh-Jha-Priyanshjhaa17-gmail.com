@@ -63,3 +63,8 @@ This is the contemporaneous implementation record. Entries describe observed wor
 - Found that the selected organization was tab-local only until reload. The non-secret organization id now travels in that tab's URL and seeds refresh, preserving independent organization context without storing credentials in browser storage. Added a reload regression test.
 - Fixed the observed mutation-notice race: a new mutation clears stale success text, and the loading skeleton now exposes progress semantics instead of competing with the success live region. Also made dependent page loads use the freshly returned permission set and removed obsolete JWT stub comments.
 - Production build and formatting checks pass. The expanded browser suite passes 32/32 in 16.8 seconds, including the original 25 tests and the new organization persistence check. The submission form remains unsubmitted.
+
+## Phase 9 — Current-head clean-checkout verification (2026-09-27)
+- Anonymously cloned public `main` at commit `b3056b7` into a new temporary directory after the requirements audit, rather than relying on the earlier pre-theme clean-checkout record.
+- Ran the documented install, database reset, and development startup sequence on the default port. Installation added 109 packages with zero reported vulnerabilities; the personalized fixture loaded its unfamiliar role and permission.
+- Verified the homepage, login API, and authenticated device listing all returned HTTP 200, with the expected five visible device records. Restored the workspace preview on port 8080 afterwards.
