@@ -11,7 +11,7 @@ Run from `starter/`:
 | `node scripts/check-jwt.js` | `ALL PASS — 43 passed, 0 failed` |
 | `node scripts/check-permissions.js` | `ALL PASS — 35 passed, 0 failed` |
 | `node scripts/check-api.js` | `ALL PASS — 66 passed, 0 failed` |
-| `npx playwright test` | `31 passed (10.3s)` |
+| `npx playwright test` | `31 passed (19.4s)` |
 
 Playwright includes all 25 original UI tests plus six added workflow/performance tests. The additional tests do not replace or weaken the original assertions.
 
@@ -38,5 +38,5 @@ Hardening covers malformed credentials, future permission versions, cross-org re
 
 - Local implementation, original test suites, supplementary checks, and documentation: complete.
 - Fresh-checkout execution: cloned implementation commit `4b508e5` into a new temporary directory, ran the documented command verbatim, and verified homepage 200, login 200, and an authenticated device list with five records. Dependency installation reported zero vulnerabilities.
-- Public personal fork and final push: pending GitHub authentication.
-- Form: not submitted. User must confirm registered phone details and authorize submission; the live walkthrough declaration requires their own review and understanding.
+- Public personal repository: pushed with unsquashed history to `https://github.com/priyanshjhaa/Priyansh-Jha-Priyanshjhaa17-gmail.com`. Anonymous Git can read `main`; anonymous raw requests for `BUILD-LOG.md` and `DECISIONS.md` both return HTTP 200.
+- Form: all verified text fields are prepared but not submitted. The user must provide the registered phone number and personally confirm the declarations, including their ability to explain and modify every submitted line.

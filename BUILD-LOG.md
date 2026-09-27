@@ -52,3 +52,8 @@ This is the contemporaneous implementation record. Entries describe observed wor
 - Replaced DM Sans and Manrope with locally bundled Space Grotesk and JetBrains Mono. Space Grotesk now carries the readable interface hierarchy; JetBrains Mono is limited to telemetry-style metadata such as statuses, table headings, version labels, and permission details.
 - The first browser run passed 30 checks and exposed a transient notice-timing failure in the device workflow. That workflow passed in isolation, followed by a clean full run of all 31 browser tests in 19.4 seconds.
 - Production build and formatting checks pass. The refreshed font bundle adds no network dependency at runtime, and the dashboard screenshot was regenerated from the final browser run.
+
+## Phase 7 — Public submission repository (2026-09-27)
+- Pushed the complete local history to the required public repository name at `github.com/priyanshjhaa/Priyansh-Jha-Priyanshjhaa17-gmail.com`, with the implementation branch published as `main`.
+- Verified public access without an authentication helper: anonymous Git resolved `refs/heads/main` to implementation commit `2189954`, and anonymous raw requests returned HTTP 200 for both required root records.
+- Re-ran the three server-side submission suites after publication: JWT 43/43, permissions 35/35, and API 66/66. The last complete browser run remains 31/31. Prepared the verified form fields; phone and personal declarations remain for the submitter.
