@@ -89,3 +89,9 @@
 - **Why:** Access tokens remain memory-only, while each tab can reload into its own organization context. An organization id is routing context rather than a credential, and the URL makes that context independently inspectable per tab.
 - **Rejected:** `localStorage`, which is shared across tabs and would create cross-tab organization bleed; relying on the first membership after every reload, which silently changes context.
 - **Reconsider if:** The application gains a real client router with organization-scoped paths, at which point the path should carry the same context instead of a query parameter.
+
+## Keep one reviewer-facing documentation set at the root
+- **Choice:** Retain the supplied specifications and discovery brief, but remove the untouched duplicate README, build-log template, and decisions template from `starter/` after completing their root replacements.
+- **Why:** The submission instructions explicitly require `BUILD-LOG.md` and `DECISIONS.md` at the repository root. The duplicate templates still described authentication as a stub and contained placeholder sections, which could mislead a reviewer about the completed state.
+- **Rejected:** Removing all supplied documentation, which would discard useful grading context; keeping every duplicate, which leaves two conflicting descriptions of the same project.
+- **Reconsider if:** The grader requires exact starter-tree preservation beyond the database schema and reference data; Git history still provides the original files without cluttering the submitted tree.

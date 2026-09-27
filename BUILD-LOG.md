@@ -68,3 +68,8 @@ This is the contemporaneous implementation record. Entries describe observed wor
 - Anonymously cloned public `main` at commit `b3056b7` into a new temporary directory after the requirements audit, rather than relying on the earlier pre-theme clean-checkout record.
 - Ran the documented install, database reset, and development startup sequence on the default port. Installation added 109 packages with zero reported vulnerabilities; the personalized fixture loaded its unfamiliar role and permission.
 - Verified the homepage, login API, and authenticated device listing all returned HTTP 200, with the expected five visible device records. Restored the workspace preview on port 8080 afterwards.
+
+## Phase 10 — Reviewer-facing repository cleanup (2026-09-27)
+- Audited tracked and ignored files before submission. Databases, installed dependencies, production builds, Playwright output, and local configuration are ignored and absent from Git; the dashboard screenshot remains tracked because the README now uses it as the visual preview.
+- Removed three untouched starter duplicates from the current tree: the obsolete starter README and empty build-log/decision templates. Their original versions remain in Git history, while the completed root documents are now the only reviewer-facing versions.
+- Added a concise About section, dashboard preview, and repository guide to the root README. Preserved the candidate specifications, discovery brief, schema, fixture, tests, and implementation evidence needed for grading.

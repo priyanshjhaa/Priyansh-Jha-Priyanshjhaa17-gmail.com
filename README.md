@@ -1,6 +1,26 @@
 # RemoteOps
 
-A multi-organization permission console built from the Rhinostream candidate starter. React dashboard, Node HTTP API, and SQLite in one process. Sessions are authorization records only; no remote connections, input injection, screen capture, shell execution, or file transfers occur.
+## About
+
+RemoteOps is a secure, multi-organization access-control console for managing people, devices, permissions, and session records from one workspace. It combines a React dashboard, Node.js HTTP API, and SQLite database in a single process.
+
+Every action is resolved against live server-side authority. A person can hold a different role in each organization, grants can allow or deny access by device and time window, and the interface renders only the actions the server authorizes. RemoteOps records sessions and audit events; it does not establish remote connections, capture screens, inject input, execute shells, or transfer files.
+
+![RemoteOps device dashboard](artifacts/dashboard.png)
+
+## Repository guide
+
+| Path | Purpose |
+|---|---|
+| `starter/web/` | React console, HTTP adapter, and development-only mock adapter |
+| `starter/server/` | Authentication, authorization, lifecycle, audit, and API routes |
+| `starter/db/` | Unmodified SQLite schema and reference catalogue |
+| `starter/tests/` | Browser contract and end-to-end workflow checks |
+| `starter/scripts/` | Database loader, required suites, hardening, and measurements |
+| `BUILD-LOG.md` | Chronological implementation record |
+| `DECISIONS.md` | Design choices, evidence, rejected alternatives, and sources |
+| `VERIFICATION.md` | Recorded suite results and clean-checkout evidence |
+| Root specification files | Original candidate requirements retained for review |
 
 ## Run from a clean checkout
 
