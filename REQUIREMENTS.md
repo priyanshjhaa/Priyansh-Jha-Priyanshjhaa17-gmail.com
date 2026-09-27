@@ -10,5 +10,6 @@
 - [x] Four original suites, personalization, added edge cases, production build
 - [x] Performance measurements and fresh-checkout startup verification
 - [x] Root log and decisions committed throughout
-- [ ] Public correctly named personal repository and final push
-- [ ] Actual suite summaries, registered contact/team details, form submission
+- [x] Public correctly named personal repository and final push
+- [x] Actual suite summaries and registered submitter/team identity
+- [ ] Registered phone confirmation, personal declarations, and form submission

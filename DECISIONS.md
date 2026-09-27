@@ -83,3 +83,9 @@
 - **Rejected:** A monospaced font across the whole application, which reduces readability; keeping DM Sans and Manrope, whose softer editorial character did not reinforce the remote-operations purpose as clearly.
 - **Reconsider if:** User testing shows the geometric letterforms or compact telemetry labels reduce readability at small sizes.
 - **Sources:** https://fontsource.org/fonts/space-grotesk and https://fontsource.org/fonts/jetbrains-mono (font files and package metadata).
+
+## Preserve tab organization context in the URL
+- **Choice:** Keep the selected organization id in the tab URL and pass it to refresh during restoration.
+- **Why:** Access tokens remain memory-only, while each tab can reload into its own organization context. An organization id is routing context rather than a credential, and the URL makes that context independently inspectable per tab.
+- **Rejected:** `localStorage`, which is shared across tabs and would create cross-tab organization bleed; relying on the first membership after every reload, which silently changes context.
+- **Reconsider if:** The application gains a real client router with organization-scoped paths, at which point the path should carry the same context instead of a query parameter.

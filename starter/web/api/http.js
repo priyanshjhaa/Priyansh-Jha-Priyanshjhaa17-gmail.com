@@ -80,7 +80,10 @@ export function createHttpApi() {
       generation++;
       return remember(await raw("POST", "/auth/login", body, null));
     },
-    restore: refresh,
+    async restore(preferredOrgId) {
+      if (preferredOrgId) orgId = preferredOrgId;
+      return refresh();
+    },
     async switchOrg(id) {
       if (refreshPromise) await refreshPromise;
       generation++;

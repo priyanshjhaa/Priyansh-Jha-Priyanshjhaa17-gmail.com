@@ -57,3 +57,9 @@ This is the contemporaneous implementation record. Entries describe observed wor
 - Pushed the complete local history to the required public repository name at `github.com/priyanshjhaa/Priyansh-Jha-Priyanshjhaa17-gmail.com`, with the implementation branch published as `main`.
 - Verified public access without an authentication helper: anonymous Git resolved `refs/heads/main` to implementation commit `2189954`, and anonymous raw requests returned HTTP 200 for both required root records.
 - Re-ran the three server-side submission suites after publication: JWT 43/43, permissions 35/35, and API 66/66. The last complete browser run remains 31/31. Prepared the verified form fields; phone and personal declarations remain for the submitter.
+
+## Phase 8 — Post-publication requirements audit (2026-09-27)
+- Returned to implementation before submitting the form and audited the published endpoint, lifecycle, permission, and UI inventories against the candidate specifications.
+- Found that the selected organization was tab-local only until reload. The non-secret organization id now travels in that tab's URL and seeds refresh, preserving independent organization context without storing credentials in browser storage. Added a reload regression test.
+- Fixed the observed mutation-notice race: a new mutation clears stale success text, and the loading skeleton now exposes progress semantics instead of competing with the success live region. Also made dependent page loads use the freshly returned permission set and removed obsolete JWT stub comments.
+- Production build and formatting checks pass. The expanded browser suite passes 32/32 in 16.8 seconds, including the original 25 tests and the new organization persistence check. The submission form remains unsubmitted.

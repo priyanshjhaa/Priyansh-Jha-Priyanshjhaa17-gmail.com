@@ -1,8 +1,7 @@
 // JWT and password hashing, hand-rolled on node:crypto.
 //
-// Nothing here is hidden behind a library on purpose. Signing is done for you;
-// `verifyAccessToken` below is a stub you have to implement. The rules it must
-// enforce are in AUTH-DATA-MODEL.md §10 and restated in the TODO comment.
+// Nothing here is hidden behind a library on purpose. Signing and verification
+// both use the pinned HS256 contract described in AUTH-DATA-MODEL.md §10.
 //
 // The payload is base64, NOT encrypted. Never put a secret in it.
 
@@ -22,7 +21,6 @@ export const ACCESS_TTL_SECONDS = 15 * 60;
 export const REFRESH_TTL_SECONDS = 30 * 24 * 60 * 60;
 
 const b64 = (buf) => Buffer.from(buf).toString("base64url");
-const unb64 = (str) => Buffer.from(str, "base64url");
 
 export function signToken(claims, secret) {
   const header = { alg: ALG, typ: "JWT" };
@@ -54,10 +52,7 @@ export function issueAccessToken({ userId, orgId, role, permVersion }, secret) {
 }
 
 // ---------------------------------------------------------------------------
-// TODO — yours to implement.
-//
 // Verify an access token and return its claims, or throw `unauthenticated(...)`.
-// The signing half above is done for you; the verifying half is the exercise.
 //
 // It must reject ALL of the following, each with a 401 UNAUTHENTICATED:
 //

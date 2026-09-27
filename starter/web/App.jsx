@@ -271,19 +271,27 @@ export default function App() {
   const inviteToken = location.pathname.startsWith("/invite/")
     ? location.pathname.split("/")[2]
     : null;
+  const preferredOrgId = new URLSearchParams(location.search).get("org");
   const [me, setMe] = useState(null),
     [restoring, setRestoring] = useState(!inviteToken),
     [bootError, setBootError] = useState(null);
   useEffect(() => {
     if (inviteToken) return;
     api
-      .restore()
+      .restore(preferredOrgId)
       .then(setMe)
       .catch((e) => {
         if (e.status !== 401) setBootError(e);
       })
       .finally(() => setRestoring(false));
   }, []);
+  useEffect(() => {
+    if (inviteToken || restoring) return;
+    const url = new URL(location.href);
+    if (me?.orgId) url.searchParams.set("org", me.orgId);
+    else url.searchParams.delete("org");
+    history.replaceState(null, "", url);
+  }, [inviteToken, restoring, me?.orgId]);
   if (inviteToken) return <Invite token={inviteToken} />;
   if (restoring)
     return (
@@ -342,7 +350,7 @@ function Workspace({ me, setMe }) {
         const members = await get("/members");
         return {
           ...members,
-          ...(allowed(permissions, "user:invite")
+          ...(allowed(fresh.permissions, "user:invite")
             ? await get("/invites")
             : { invites: [] }),
         };
@@ -352,7 +360,7 @@ function Workspace({ me, setMe }) {
         return {
           ...grants,
           ...(await get("/members")),
-          ...(allowed(permissions, "device:list")
+          ...(allowed(fresh.permissions, "device:list")
             ? await get("/devices")
             : { devices: [] }),
         };
@@ -360,7 +368,7 @@ function Workspace({ me, setMe }) {
       if (current === "sessions")
         return {
           ...(await get("/sessions")),
-          ...(allowed(permissions, "device:list")
+          ...(allowed(fresh.permissions, "device:list")
             ? await get("/devices")
             : { devices: [] }),
         };
@@ -412,6 +420,7 @@ function Workspace({ me, setMe }) {
   }
   async function mutate(method, path, body, message = "Changes saved") {
     setError(null);
+    setNotice("");
     try {
       const result = await api.request(method, path, body);
       setModal(null);
@@ -689,7 +698,11 @@ function Workspace({ me, setMe }) {
             </div>
           )}
           {loading || switching ? (
-            <div className="card skeleton" role="status">
+            <div
+              className="card skeleton"
+              role="progressbar"
+              aria-label="Loading workspace"
+            >
               Loading workspace…
             </div>
           ) : (

@@ -71,6 +71,17 @@ test("organization settings persist and active navigation can refresh", async ({
   );
   await expect(page.getByRole("heading", { name, exact: true })).toBeVisible();
 });
+test("the selected organization survives a reload in its tab", async ({ page }) => {
+  await fresh(page);
+  const shell = page.getByTestId("app-shell");
+  const orgId = await shell.getAttribute("data-org-id");
+  await expect(page).toHaveURL(new RegExp(`[?&]org=${orgId}(?:&|$)`));
+  await page.reload();
+  await expect(page.getByTestId("app-shell")).toHaveAttribute(
+    "data-org-id",
+    orgId,
+  );
+});
 test("network failure remains visible and accessible", async ({ page }) => {
   await page.goto("/");
   await page.route("**/v1/auth/login", (r) => r.abort("failed"));
